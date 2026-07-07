@@ -27,8 +27,12 @@ class ProductFactory extends Factory
 
         $currency = app(CurrencyService::class);
 
-        $images = collect(range(1, 3))
-            ->map(fn (int $i) => "https://picsum.photos/seed/{$slug}-{$i}/900/1200")
+        $pool = [4625792, 13074496, 6675408, 20544951, 8180704, 9958445];
+
+        $images = collect($pool)
+            ->shuffle()
+            ->take(2)
+            ->map(fn (int $id) => "https://images.pexels.com/photos/{$id}/pexels-photo-{$id}.jpeg?auto=compress&cs=tinysrgb&w=900&h=1200&fit=crop")
             ->all();
 
         return [

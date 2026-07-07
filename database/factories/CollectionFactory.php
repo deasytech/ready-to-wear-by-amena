@@ -20,10 +20,12 @@ class CollectionFactory extends Factory
             'The Noir Edit', 'Resort Season', 'Signature Tailoring', 'The Minimalist',
         ]);
 
+        $imageId = fake()->randomElement([17945059, 20544951, 34691207, 9834550]);
+
         return [
             'name' => $name,
             'slug' => \Illuminate\Support\Str::slug($name),
-            'image' => 'https://picsum.photos/seed/'.\Illuminate\Support\Str::slug($name).'/1600/900',
+            'image' => "https://images.pexels.com/photos/{$imageId}/pexels-photo-{$imageId}.jpeg?auto=compress&cs=tinysrgb&w=1600&h=900&fit=crop",
             'description' => fake()->paragraph(2),
             'is_active' => true,
             'sort_order' => fake()->numberBetween(0, 10),

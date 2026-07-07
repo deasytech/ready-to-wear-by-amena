@@ -5,7 +5,7 @@
 
 <x-layouts.storefront :title="'About'" :description="$main?->title ? strip_tags($main->content) : null">
     <section class="relative flex h-[50vh] min-h-[360px] items-end overflow-hidden bg-neutral-900 text-white">
-        <img src="https://picsum.photos/seed/rtw-about/1920/900" alt="" aria-hidden="true" class="absolute inset-0 size-full object-cover opacity-70">
+        <img src="https://images.pexels.com/photos/4614250/pexels-photo-4614250.jpeg?auto=compress&cs=tinysrgb&w=1920&h=900&fit=crop" alt="" aria-hidden="true" class="absolute inset-0 size-full object-cover opacity-70">
         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
         <div class="rtw-container relative pb-12">
             <p class="rtw-label mb-3 text-white/80">About</p>

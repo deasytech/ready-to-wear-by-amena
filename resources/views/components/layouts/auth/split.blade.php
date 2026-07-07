@@ -6,7 +6,7 @@
     <body class="min-h-screen bg-white font-sans text-black antialiased">
         <div class="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
             <div class="relative hidden h-full flex-col justify-between overflow-hidden bg-black p-10 text-white lg:flex">
-                <img src="https://picsum.photos/seed/rtw-auth/1200/1600" alt="" aria-hidden="true" class="absolute inset-0 size-full object-cover opacity-60">
+                <img src="https://images.pexels.com/photos/34691207/pexels-photo-34691207.jpeg?auto=compress&cs=tinysrgb&w=1200&h=1600&fit=crop" alt="" aria-hidden="true" class="absolute inset-0 size-full object-cover opacity-60">
                 <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10"></div>
 
                 <a href="{{ route('home') }}" class="relative z-20 flex items-center" wire:navigate>

@@ -19,6 +19,25 @@ use Illuminate\Support\Str;
 
 class CatalogSeeder extends Seeder
 {
+    /**
+     * Real, category-relevant fashion photography (Pexels, free to use) keyed by
+     * catalogue category. Products cycle through their category's pool so every
+     * item gets an on-topic (if not perfectly unique) product image instead of
+     * random unrelated placeholder photos.
+     */
+    protected const IMAGE_POOLS = [
+        'Dresses' => [4625792, 13074496, 6675408, 20544951, 8180704, 9958445, 14873046, 19477367, 32335610, 27516229],
+        'Two Pieces' => [12958683, 6580495, 32498728, 8484104, 8484108, 33339928],
+        'Tops' => [7202800, 9834550, 7959816, 7202789, 20781335, 7203738, 20636648, 20636636, 32649060, 18504977, 31033199, 26241360],
+        'Bottoms' => [7202826, 7202768, 31400265, 5253944, 8946961, 18532851, 13214674, 5478513, 19510506, 15114415, 7636101, 27786098],
+        'Accessories' => [4004225, 34501351, 2986445, 36365228, 36367488, 26316185, 27174557, 31959214],
+    ];
+
+    protected static function pexelsUrl(int $id, int $width, int $height): string
+    {
+        return "https://images.pexels.com/photos/{$id}/pexels-photo-{$id}.jpeg?auto=compress&cs=tinysrgb&w={$width}&h={$height}&fit=crop";
+    }
+
     public function run(): void
     {
         $this->seedBanners();
@@ -39,12 +58,12 @@ class CatalogSeeder extends Seeder
             [
                 'title' => 'The New Season Edit',
                 'description' => 'Tailoring and fluid silhouettes, cut for a considered wardrobe.',
-                'image' => 'https://picsum.photos/seed/rtw-hero/1920/1080',
+                'image' => static::pexelsUrl(8602141, 1920, 1080),
             ],
             [
                 'title' => 'The Noir Edit',
                 'description' => 'A study in restraint — black, sculpted, unmistakably RTW.',
-                'image' => 'https://picsum.photos/seed/rtw-campaign/1920/900',
+                'image' => static::pexelsUrl(29897139, 1920, 900),
             ],
         ];
 
@@ -60,9 +79,10 @@ class CatalogSeeder extends Seeder
 
         foreach ($names as $name) {
             $slug = Str::slug($name);
+            $categoryImage = static::pexelsUrl(static::IMAGE_POOLS[$name][0], 900, 1100);
             $categories[$name] = Category::updateOrCreate(
                 ['slug' => $slug],
-                ['name' => $name, 'is_active' => true, 'image' => "https://picsum.photos/seed/rtw-category-{$slug}/900/1100"]
+                ['name' => $name, 'is_active' => true, 'image' => $categoryImage]
             );
         }
 
@@ -183,6 +203,8 @@ class CatalogSeeder extends Seeder
         foreach ($catalogue as $categoryName => $names) {
             $category = $categories[$categoryName];
 
+            $pool = static::IMAGE_POOLS[$categoryName];
+
             foreach ($names as $index => $name) {
                 $globalIndex++;
                 $slug = Str::slug($name);
@@ -194,8 +216,8 @@ class CatalogSeeder extends Seeder
                         'category_id' => $category->id,
                         'name' => $name,
                         'images' => [
-                            "https://picsum.photos/seed/{$slug}-1/900/1200",
-                            "https://picsum.photos/seed/{$slug}-2/900/1200",
+                            static::pexelsUrl($pool[$index % count($pool)], 900, 1200),
+                            static::pexelsUrl($pool[($index + 1) % count($pool)], 900, 1200),
                         ],
                         'description' => $this->descriptionFor($name, $categoryName),
                         'price' => $price,
@@ -252,17 +274,28 @@ class CatalogSeeder extends Seeder
     protected function seedCollections(array $products): void
     {
         $collections = [
-            'The Noir Edit' => ['the-noir-cocktail-dress', 'noir-structured-blazer', 'signature-tailored-trousers', 'the-column-maxi-dress', 'the-leather-belt'],
-            'Resort Season' => ['the-bias-slip-dress', 'the-linen-two-piece', 'the-wrap-midi-dress', 'the-silk-scarf', 'the-silk-camisole'],
-            'Signature Tailoring' => ['ada-silk-set', 'the-tailored-co-ord', 'signature-poplin-shirt', 'the-wide-leg-trousers', 'the-pencil-skirt'],
+            'The Noir Edit' => [
+                'slugs' => ['the-noir-cocktail-dress', 'noir-structured-blazer', 'signature-tailored-trousers', 'the-column-maxi-dress', 'the-leather-belt'],
+                'image' => 17945059,
+            ],
+            'Resort Season' => [
+                'slugs' => ['the-bias-slip-dress', 'the-linen-two-piece', 'the-wrap-midi-dress', 'the-silk-scarf', 'the-silk-camisole'],
+                'image' => 20544951,
+            ],
+            'Signature Tailoring' => [
+                'slugs' => ['ada-silk-set', 'the-tailored-co-ord', 'signature-poplin-shirt', 'the-wide-leg-trousers', 'the-pencil-skirt'],
+                'image' => 34691207,
+            ],
         ];
 
-        foreach ($collections as $name => $slugs) {
+        foreach ($collections as $name => $data) {
+            $slugs = $data['slugs'];
+
             $collection = Collection::updateOrCreate(
                 ['slug' => Str::slug($name)],
                 [
                     'name' => $name,
-                    'image' => 'https://picsum.photos/seed/'.Str::slug($name).'/1600/900',
+                    'image' => static::pexelsUrl($data['image'], 1600, 900),
                     'description' => "A curated edit built around {$name}.",
                     'is_active' => true,
                 ]
