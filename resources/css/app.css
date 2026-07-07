@@ -1,0 +1,111 @@
+@import "tailwindcss";
+@import "../../vendor/livewire/flux/dist/flux.css";
+
+@import "tailwindcss";
+/* Preline UI */
+@import "../../node_modules/preline/variants.css";
+@source "../../node_modules/preline/dist/*.js";
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
+@source '../../vendor/livewire/flux/stubs/**/*.blade.php';
+
+/* @custom-variant dark (&:where(.dark, .dark *)); */
+@theme {
+    --color-gold: #d2af40;
+}
+
+@theme {
+    --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+        "Noto Color Emoji";
+    --font-serif: "Playfair Display", ui-serif, Georgia, "Times New Roman",
+        serif;
+
+    --color-zinc-50: #fafafa;
+    --color-zinc-100: #f5f5f5;
+    --color-zinc-200: #e5e5e5;
+    --color-zinc-300: #d4d4d4;
+    --color-zinc-400: #a3a3a3;
+    --color-zinc-500: #737373;
+    --color-zinc-600: #525252;
+    --color-zinc-700: #404040;
+    --color-zinc-800: #262626;
+    --color-zinc-900: #171717;
+    --color-zinc-950: #0a0a0a;
+
+    --color-accent: var(--color-neutral-800);
+    --color-accent-content: var(--color-neutral-800);
+    --color-accent-foreground: var(--color-white);
+}
+
+/* @layer theme {
+    .dark {
+        --color-accent: var(--color-white);
+        --color-accent-content: var(--color-white);
+        --color-accent-foreground: var(--color-neutral-800);
+    }
+} */
+
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+}
+
+[data-flux-field]:not(ui-radio, ui-checkbox) {
+    @apply grid gap-2;
+}
+
+[data-flux-label] {
+    @apply !mb-0 !leading-tight;
+}
+
+input:focus[data-flux-control],
+textarea:focus[data-flux-control],
+select:focus[data-flux-control] {
+    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Storefront design system                                               */
+/* ---------------------------------------------------------------------- */
+
+@layer components {
+    .rtw-container {
+        @apply mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-10;
+    }
+
+    .rtw-btn-primary {
+        @apply inline-flex items-center justify-center gap-2 border border-black bg-black px-7 py-3.5 text-xs font-medium tracking-[0.15em] whitespace-nowrap text-white uppercase transition-colors duration-200 hover:bg-white hover:text-black;
+    }
+
+    .rtw-btn-secondary {
+        @apply inline-flex items-center justify-center gap-2 border border-black bg-white px-7 py-3.5 text-xs font-medium tracking-[0.15em] whitespace-nowrap text-black uppercase transition-colors duration-200 hover:bg-black hover:text-white;
+    }
+
+    .rtw-btn-ghost {
+        @apply inline-flex items-center justify-center gap-2 border border-white bg-transparent px-7 py-3.5 text-xs font-medium tracking-[0.15em] whitespace-nowrap text-white uppercase transition-colors duration-200 hover:bg-white hover:text-black;
+    }
+
+    .rtw-label {
+        @apply text-xs font-medium tracking-[0.15em] text-neutral-500 uppercase;
+    }
+
+    .rtw-link-underline {
+        @apply relative inline-block after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:w-full;
+    }
+
+    .rtw-focus {
+        @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2;
+    }
+}
+
+/* \[:where(&)\]:size-4 {
+    @apply size-4;
+} */

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php artisan *)",
+      "Bash(composer dump-autoload *)",
+      "Bash(./vendor/bin/pint app/Mail/OrderPlaced.php app/Services/CartService.php app/Services/PaymentService.php app/Services/ShipBubbleService.php app/Services/CurrencyService.php app/Services/OrderService.php app/Services/Payments/PaymentGatewayInterface.php app/Services/Payments/PaystackGateway.php app/Support/Media.php database/factories/CategoryFactory.php database/factories/CollectionFactory.php database/factories/ProductFactory.php database/factories/ProductVariantFactory.php database/factories/ShippingMethodFactory.php database/factories/ColorFactory.php database/factories/SizeFactory.php database/seeders/CatalogSeeder.php database/seeders/AboutPageSeeder.php)",
+      "Bash(npm run *)"
+    ]
+  }
+}
