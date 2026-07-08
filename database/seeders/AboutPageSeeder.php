@@ -14,7 +14,7 @@ class AboutPageSeeder extends Seeder
     {
         About::updateOrCreate(['section_name' => 'main_about'], [
             'title' => 'About Us',
-            'content' => '<p class="short-desc mr-2">Ready To Wear by Amena is a womenswear label built on precise tailoring, considered fabrics, and a refusal to chase trends. Every piece is designed to be worn, re-worn, and lived in &mdash; not saved for one occasion and forgotten.</p>
+            'content' => '<p class="short-desc mr-2">Ready-To-Wear by Amena is a womenswear label built on precise tailoring, considered fabrics, and a refusal to chase trends. Every piece is designed to be worn, re-worn, and lived in &mdash; not saved for one occasion and forgotten.</p>
 
 <p class="short-desc">We work in a restrained palette of black, white and neutral tones, letting cut and construction carry each collection rather than colour or print. It is a quieter kind of luxury, built for women who dress for themselves first.</p>
 
@@ -25,7 +25,7 @@ class AboutPageSeeder extends Seeder
 
         About::updateOrCreate(['section_name' => 'our_story'], [
             'title' => 'Our Story',
-            'content' => '<p>Ready To Wear by Amena began with a simple frustration: too much of what filled our own closets felt disposable &mdash; fast, trend-driven, forgotten within a season. Amena set out to design the opposite. Pieces cut with intention, finished properly, and built to anchor a wardrobe rather than clutter it.</p>
+            'content' => '<p>Ready-To-Wear by Amena began with a simple frustration: too much of what filled our own closets felt disposable &mdash; fast, trend-driven, forgotten within a season. Amena set out to design the opposite. Pieces cut with intention, finished properly, and built to anchor a wardrobe rather than clutter it.</p>
 
 <p>What started as a small made-to-order tailoring practice has grown into a full ready-to-wear label, but the founding principle has not changed: fewer, better pieces, made well enough to outlast the season they were designed for.</p>
 
@@ -36,7 +36,7 @@ class AboutPageSeeder extends Seeder
 
         About::updateOrCreate(['section_name' => 'our_culture'], [
             'title' => 'Our Culture',
-            'content' => '<p>Ready To Wear by Amena is a small, deliberately-run studio. We produce in limited runs rather than mass quantities, which means more control over fit, finishing, and the working conditions behind every garment.</p>
+            'content' => '<p>Ready-To-Wear by Amena is a small, deliberately-run studio. We produce in limited runs rather than mass quantities, which means more control over fit, finishing, and the working conditions behind every garment.</p>
 
 <p>We favour natural and responsibly-sourced fabrics &mdash; silk, wool, cotton poplin &mdash; and work with a small network of pattern makers and tailors we know by name.</p>
 

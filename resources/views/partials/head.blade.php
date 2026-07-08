@@ -2,10 +2,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 @php
-    $metaTitle = isset($title) ? "{$title} | Ready To Wear by Amena" : 'Ready To Wear by Amena';
+    $metaTitle = isset($title) ? "{$title} | Ready-To-Wear by Amena" : 'Ready-To-Wear by Amena';
     $metaDescription =
         $description ??
-        'Ready To Wear by Amena is a monochrome womenswear label built on precise tailoring, considered fabrics and editorial minimalism.';
+        'Ready-To-Wear by Amena is a monochrome womenswear label built on precise tailoring, considered fabrics and editorial minimalism.';
 @endphp
 
 {{-- Dynamic Title and Meta Description --}}

@@ -64,7 +64,7 @@ class StockistSeeder extends Seeder
             ],
             [
                 'name' => 'RTW Abuja Wuse 2',
-                'description' => 'Bringing Ready To Wear by Amena to the capital, with a curated edit of the current collection.',
+                'description' => 'Bringing Ready-To-Wear by Amena to the capital, with a curated edit of the current collection.',
                 'address' => 'Plot 227, Adetokunbo Ademola Crescent',
                 'city' => 'Abuja',
                 'state' => 'FCT',

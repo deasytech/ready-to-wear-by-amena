@@ -8,7 +8,7 @@ use App\Models\User;
 it('renders the homepage', function () {
     Product::factory()->for(Category::factory())->create();
 
-    $this->get(route('home'))->assertOk()->assertSee('Ready To Wear by Amena');
+    $this->get(route('home'))->assertOk()->assertSee('Ready-To-Wear by Amena');
 });
 
 it('renders the shop page and filters by category', function () {
@@ -79,13 +79,13 @@ it('lets authenticated customers view order history and addresses', function () 
 });
 
 it('renders the auth pages with rtw branding', function () {
-    $this->get(route('login'))->assertOk()->assertSee('Ready To Wear by Amena');
+    $this->get(route('login'))->assertOk()->assertSee('Ready-To-Wear by Amena');
     $this->get(route('register'))->assertOk();
 });
 
 it('renders account settings pages in the storefront layout', function () {
     $user = User::factory()->create();
 
-    $this->actingAs($user)->get(route('settings.profile'))->assertOk()->assertSee('Ready To Wear by Amena');
+    $this->actingAs($user)->get(route('settings.profile'))->assertOk()->assertSee('Ready-To-Wear by Amena');
     $this->actingAs($user)->get(route('settings.password'))->assertOk();
 });

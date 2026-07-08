@@ -6,23 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     {{-- Dynamic Title and Meta Description --}}
-    <title>{{ $title ?? _('Ready to Wear') }}</title>
+    <title>{{ $title ?? _('Ready-To-Wear') }}</title>
     <meta name="description"
-        content="{{ $description ?? 'Discover Ready to Wear - a premium cosmetics brand offering natural skincare, exfoliating body scrubs, and nourishing lip gloss. Reveal glowing, healthy skin with our handcrafted beauty essentials.' }}">
+        content="{{ $description ?? 'Discover Ready-To-Wear - a premium cosmetics brand offering natural skincare, exfoliating body scrubs, and nourishing lip gloss. Reveal glowing, healthy skin with our handcrafted beauty essentials.' }}">
 
     {{-- Open Graph for Social Sharing --}}
-    <meta property="og:title" content="{{ $title ?? 'Ready to Wear' }}">
+    <meta property="og:title" content="{{ $title ?? 'Ready-To-Wear' }}">
     <meta property="og:description"
-        content="{{ $description ?? 'Discover Ready to Wear - a premium cosmetics brand offering natural skincare, exfoliating body scrubs, and nourishing lip gloss. Reveal glowing, healthy skin with our handcrafted beauty essentials.' }}">
+        content="{{ $description ?? 'Discover Ready-To-Wear - a premium cosmetics brand offering natural skincare, exfoliating body scrubs, and nourishing lip gloss. Reveal glowing, healthy skin with our handcrafted beauty essentials.' }}">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:type" content="website">
     <meta property="og:image" content="{{ asset('images/logo/1.png') }}">
 
     {{-- Twitter Card --}}
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ $title ?? 'Ready to Wear' }}">
+    <meta name="twitter:title" content="{{ $title ?? 'Ready-To-Wear' }}">
     <meta name="twitter:description"
-        content="{{ $description ?? 'Discover Ready to Wear - a premium cosmetics brand offering natural skincare, exfoliating body scrubs, and nourishing lip gloss. Reveal glowing, healthy skin with our handcrafted beauty essentials.' }}">
+        content="{{ $description ?? 'Discover Ready-To-Wear - a premium cosmetics brand offering natural skincare, exfoliating body scrubs, and nourishing lip gloss. Reveal glowing, healthy skin with our handcrafted beauty essentials.' }}">
     <meta name="twitter:image" content="{{ asset('images/logo/1.png') }}">
 
     {{-- Canonical URL --}}

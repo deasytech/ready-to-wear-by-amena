@@ -61,7 +61,7 @@ class User extends Authenticatable implements FilamentUser
     {
         return Str::of($this->name)
             ->explode(' ')
-            ->map(fn (string $name) => Str::of($name)->substr(0, 1))
+            ->map(fn(string $name) => Str::of($name)->substr(0, 1))
             ->implode('');
     }
 
@@ -95,6 +95,6 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->email === 'super@admin.com';
+        return $this->email === 'admin@readytowearbyamena.com';
     }
 }

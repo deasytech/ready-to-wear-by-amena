@@ -5,11 +5,12 @@
 
 <x-layouts.storefront :title="'About'" :description="$main?->title ? strip_tags($main->content) : null">
     <section class="relative flex h-[50vh] min-h-[360px] items-end overflow-hidden bg-neutral-900 text-white">
-        <img src="https://images.pexels.com/photos/4614250/pexels-photo-4614250.jpeg?auto=compress&cs=tinysrgb&w=1920&h=900&fit=crop" alt="" aria-hidden="true" class="absolute inset-0 size-full object-cover opacity-70">
+        <img src="https://images.pexels.com/photos/4614250/pexels-photo-4614250.jpeg?auto=compress&cs=tinysrgb&w=1920&h=900&fit=crop"
+            alt="" aria-hidden="true" class="absolute inset-0 size-full object-cover opacity-70">
         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
         <div class="rtw-container relative pb-12">
             <p class="rtw-label mb-3 text-white/80">About</p>
-            <h1 class="font-serif text-4xl lg:text-5xl">Ready To Wear by Amena</h1>
+            <h1 class="font-serif text-4xl lg:text-5xl">Ready-To-Wear by Amena</h1>
         </div>
     </section>
 
@@ -21,7 +22,8 @@
                         <h2 class="font-serif text-3xl">{{ $section->title }}</h2>
                     @endif
                     @if ($section->image_url)
-                        <img src="{{ $section->image_url }}" alt="{{ $section->title }}" class="my-8 aspect-[4/3] w-full object-cover">
+                        <img src="{{ $section->image_url }}" alt="{{ $section->title }}"
+                            class="my-8 aspect-[4/3] w-full object-cover">
                     @endif
                     <div class="prose prose-neutral mt-6 text-sm leading-relaxed text-neutral-600">
                         {!! $section->content !!}

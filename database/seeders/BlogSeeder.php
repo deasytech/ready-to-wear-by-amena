@@ -15,7 +15,7 @@ class BlogSeeder extends Seeder
     {
         $blogPosts = [
             [
-                'title' => 'Building a Capsule Wardrobe with Ready To Wear by Amena',
+                'title' => 'Building a Capsule Wardrobe with Ready-To-Wear by Amena',
                 'excerpt' => 'A considered edit of versatile, well-made pieces will always outlast a closet full of trends. Here is how we think about building one.',
                 'content' => '<h2>Fewer, Better Pieces</h2>
 <p>A capsule wardrobe is not about owning less for its own sake &mdash; it is about owning pieces that work harder. Every silhouette in our collections is designed to move between occasions: a tailored trouser that takes you from a morning meeting to a dinner reservation, a slip dress that layers under a blazer or stands alone.</p>
@@ -37,7 +37,7 @@ class BlogSeeder extends Seeder
                 'title' => 'Caring for Silk, Wool and Tailored Fabrics',
                 'excerpt' => 'Our pieces are made to last well beyond a single season. A short guide to keeping them that way.',
                 'content' => '<h2>Read the Label First</h2>
-<p>Every Ready To Wear by Amena piece is finished with fabric-specific care instructions. Following them is the single most effective way to protect your investment.</p>
+<p>Every Ready-To-Wear by Amena piece is finished with fabric-specific care instructions. Following them is the single most effective way to protect your investment.</p>
 
 <h2>Silk</h2>
 <p>Hand wash in cold water with a gentle detergent, or dry clean for structured silk pieces. Always air dry away from direct sunlight to preserve colour.</p>
