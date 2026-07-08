@@ -18,6 +18,7 @@ use App\Livewire\Settings\Profile;
 use App\Livewire\Shop\Index as ShopIndex;
 use App\Livewire\Shop\Show as ProductShow;
 use App\Livewire\Wishlist\WishlistPage;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomePage::class)->name('home');
@@ -59,4 +60,19 @@ Route::middleware(['auth'])->group(function () {
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
 });
 
-require __DIR__.'/auth.php';
+Route::get('generate', function () {
+    Artisan::call('storage:link');
+    echo 'storage generated';
+});
+
+Route::get('optimize', function () {
+    Artisan::call('optimize:clear');
+    echo 'site optimized';
+});
+
+Route::get('migrate', function () {
+    Artisan::call('migrate');
+    echo 'database migrated';
+});
+
+require __DIR__ . '/auth.php';
