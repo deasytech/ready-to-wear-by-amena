@@ -21,6 +21,11 @@
                 </section>
 
                 <section>
+                    <h2 class="mb-2 font-serif text-xl text-black">Refunds</h2>
+                    <p>Where a refund is approved &mdash; including for orders cancelled due to stock unavailability &mdash; it is issued to your original payment method via Paystack within 5&ndash;10 business days of approval. You'll receive an email confirmation once the refund has been processed.</p>
+                </section>
+
+                <section>
                     <h2 class="mb-2 font-serif text-xl text-black">Order Tracking</h2>
                     <p>Once your order ships, you'll receive a confirmation email with a tracking link. You can also view order status any time from your account.</p>
                 </section>

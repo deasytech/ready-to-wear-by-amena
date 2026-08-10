@@ -25,7 +25,7 @@
     </section>
 
     {{-- New Arrivals --}}
-    @if ($newArrivals->isNotEmpty())
+    {{-- @if ($newArrivals->isNotEmpty())
         <section class="rtw-container py-16 lg:py-24">
             <div class="mb-10 flex items-end justify-between">
                 <div>
@@ -43,10 +43,10 @@
                 @endforeach
             </div>
         </section>
-    @endif
+    @endif --}}
 
     {{-- Featured Collection --}}
-    @if ($featuredCollection)
+    {{-- @if ($featuredCollection)
         <section class="grid lg:grid-cols-2">
             <div class="relative aspect-[4/3] lg:aspect-auto">
                 <img src="{{ $featuredCollection->image_url }}" alt="{{ $featuredCollection->name }}"
@@ -60,7 +60,7 @@
                     class="rtw-btn-primary mt-8">Discover the Collection</a>
             </div>
         </section>
-    @endif
+    @endif --}}
 
     {{-- Shop by Category --}}
     @if ($categories->isNotEmpty())

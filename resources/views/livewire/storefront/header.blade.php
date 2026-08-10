@@ -20,8 +20,8 @@
 
             {{-- Desktop nav --}}
             <nav class="hidden items-center gap-8 lg:flex" aria-label="Primary">
-                <a href="{{ route('shop.index', ['sort' => 'newest']) }}" wire:navigate
-                    class="rtw-link-underline text-xs font-medium tracking-[0.1em] uppercase">New Arrivals</a>
+                {{-- <a href="{{ route('shop.index', ['sort' => 'newest']) }}" wire:navigate
+                    class="rtw-link-underline text-xs font-medium tracking-[0.1em] uppercase">New Arrivals</a> --}}
                 <a href="{{ route('shop.index') }}" wire:navigate
                     class="rtw-link-underline text-xs font-medium tracking-[0.1em] uppercase">Shop</a>
                 <div class="group relative">
