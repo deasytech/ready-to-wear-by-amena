@@ -70,10 +70,10 @@
                 <h2 class="font-serif text-3xl lg:text-4xl">Shop by Category</h2>
             </div>
 
-            <div class="grid grid-cols-2 gap-4 lg:grid-cols-5">
+            <div class="flex flex-wrap justify-center gap-4">
                 @foreach ($categories as $category)
                     <a href="{{ route('shop.index', ['category' => $category->slug]) }}" wire:navigate
-                        class="group relative block aspect-[3/4] overflow-hidden bg-neutral-100">
+                        class="group relative block aspect-[3/4] w-[calc(50%_-_0.5rem)] overflow-hidden bg-neutral-100 lg:w-[calc(20%_-_0.8rem)]">
                         <img src="{{ $category->image_url }}" alt="{{ $category->name }}" loading="lazy"
                             class="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105">
                         <div class="absolute inset-0 bg-black/10 transition-colors group-hover:bg-black/25"></div>

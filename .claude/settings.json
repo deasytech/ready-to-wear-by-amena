@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" \"https://images.pexels.com/photos/4625792/pexels-photo-4625792.jpeg?auto=compress&cs=tinysrgb&w=900&h=1100&fit=crop\")",
+      "Bash(curl -sI http://localhost:8000/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5173/@vite/client)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://[::1]:5173/@vite/client)",
+      "Bash(curl -s \"http://localhost:5173/resources/css/app.css\")",
+      "Bash(node -e \"require\\('puppeteer'\\)\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://rtw.test/)",
+      "Bash(curl -s http://rtw.test/)"
+    ]
+  }
+}
