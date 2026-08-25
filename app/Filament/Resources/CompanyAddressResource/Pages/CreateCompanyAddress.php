@@ -55,8 +55,16 @@ class CreateCompanyAddress extends CreateRecord
             $data['postal_code']    = $addressData['postal_code'] ?? ($data['postal_code'] ?? null);
             $data['country']        = $addressData['country'] ?? ($data['country'] ?? null);
         } catch (\Exception $e) {
-            Log::error('ShipBubble Error: ' . $e->getMessage());
-            $this->addError('shipping', $e->getMessage());
+            Log::error('ShipBubble Error: '.$e->getMessage());
+
+            // Still let the address save without a ShipBubble address_code -
+            // the admin's data entry shouldn't be lost over a courier API
+            // hiccup. Editing the record afterwards will retry validation.
+            Notification::make()
+                ->danger()
+                ->title('Could not verify this address with ShipBubble')
+                ->body('The address was saved, but shipping validation failed (the courier API may be temporarily unavailable). Open and save it again to retry.')
+                ->send();
         }
 
         $data['user_id'] = Auth::id();

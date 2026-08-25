@@ -4,7 +4,6 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\ShippingMethod;
 use App\Models\User;
 use App\Services\CartService;
 use App\Services\Payments\PaymentGatewayInterface;
@@ -22,7 +21,6 @@ it('redirects to the paystack authorization url when placing an online order', f
 
     $product = Product::factory()->for(Category::factory())->create(['price' => 30000]);
     $variant = ProductVariant::factory()->for($product)->create(['stock' => 5]);
-    $shippingMethod = ShippingMethod::factory()->create();
 
     app(CartService::class)->addItem($product, $variant, 1);
 
@@ -35,7 +33,10 @@ it('redirects to the paystack authorization url when placing an online order', f
         ->set('city', 'Lekki')
         ->set('state', 'Lagos')
         ->set('country', 'Nigeria')
-        ->set('shipping_method_id', $shippingMethod->id)
+        ->set('liveCouriers', [
+            ['courier_name' => 'Fake Courier', 'display_amount' => 2500, 'display_currency' => 'NGN'],
+        ])
+        ->set('selectedCourierIndex', 0)
         ->set('payment_method', 'paystack')
         ->set('step', 5)
         ->call('placeOrder');

@@ -4,6 +4,7 @@ namespace App\Livewire\Storefront;
 
 use App\Models\Collection;
 use App\Services\CartService;
+use App\Services\CurrencyService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\On;
@@ -15,10 +16,36 @@ class Header extends Component
 
     public int $wishlistCount = 0;
 
-    public function mount(CartService $cartService): void
+    public string $currentCurrency = 'NGN';
+
+    public function mount(CartService $cartService, CurrencyService $currencyService): void
     {
         $this->refreshCartCount($cartService);
         $this->refreshWishlistCount();
+        $this->currentCurrency = $currencyService->getCurrentCurrency();
+    }
+
+    /**
+     * Switching currency reprices the active cart and needs every other
+     * Livewire component on the page (product prices, cart totals, checkout)
+     * to recompute against it, so a full page reload is the simplest way to
+     * keep everything consistent rather than wiring events through every
+     * storefront component individually.
+     */
+    public function changeCurrency(string $currency, CurrencyService $currencyService, CartService $cartService): void
+    {
+        if (! array_key_exists($currency, $currencyService->getSupportedCurrencies())) {
+            return;
+        }
+
+        $currencyService->setCurrentCurrency($currency);
+        $cartService->syncCurrency($cartService->current(), $currency);
+
+        // Inside a Livewire action, url()->current() resolves to the AJAX
+        // endpoint the browser just posted to (/livewire/update), not the page
+        // the component is rendered on - redirecting there 404s/405s. The
+        // Referer header is what the browser was actually looking at.
+        $this->redirect(request()->header('Referer') ?? route('home'), navigate: false);
     }
 
     #[On('cart-updated')]
@@ -54,7 +81,7 @@ class Header extends Component
         $this->refreshWishlistCount();
     }
 
-    public function render()
+    public function render(CurrencyService $currencyService)
     {
         $navCollections = Cache::remember(
             'nav-collections',
@@ -64,6 +91,7 @@ class Header extends Component
 
         return view('livewire.storefront.header', [
             'navCollections' => $navCollections,
+            'currencies' => $currencyService->getSupportedCurrencies(),
         ]);
     }
 }

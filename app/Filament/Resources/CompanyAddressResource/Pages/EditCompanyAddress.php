@@ -33,25 +33,50 @@ class EditCompanyAddress extends EditRecord
             ->body('The address has been saved successfully.');
     }
 
-    protected function mutateFormDataBeforeFill(array $data): array
+    /**
+     * Re-validate the address with ShipBubble when the admin actually saves
+     * changes - not on every page load, which would otherwise fire a write
+     * against ShipBubble's API just from opening the edit form.
+     */
+    protected function mutateFormDataBeforeSave(array $data): array
     {
         $sb = new ShipBubbleService();
 
-        $addressPayload = [
-            'name'              => $data['name'],
-            'email'             => $data['email'],
-            'phone'             => $data['phone'],
-            'address_code'      => $data['address_code'],
-        ];
+        // address_code isn't a form field, so it never appears in $data - read
+        // it from the underlying record. A record created while ShipBubble was
+        // unavailable has no address_code yet, so there's nothing to "update";
+        // validate it fresh instead.
+        $existingAddressCode = $this->getRecord()->address_code;
+        $hasAddressCode = ! empty($existingAddressCode);
+
+        $addressPayload = $hasAddressCode
+            ? [
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'phone' => $data['phone'],
+                'address_code' => $existingAddressCode,
+            ]
+            : [
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'phone' => $data['phone'],
+                'address' => $data['address'],
+            ];
 
         try {
-            $updatedAddress = $sb->updateAddress($addressPayload);
+            $response = $hasAddressCode
+                ? $sb->updateAddress($addressPayload)
+                : $sb->validateAddress($addressPayload);
 
-            if (is_string($updatedAddress)) {
-                $updatedAddress = json_decode($updatedAddress, true);
+            if (is_string($response)) {
+                $response = json_decode($response, true);
             }
-            Log::debug('Updated Address: ' . print_r($updatedAddress, true));
-            $addressData = $updatedAddress['data'] ?? $updatedAddress;
+
+            $addressData = $response['data'] ?? $response;
+
+            if (! $hasAddressCode) {
+                $data['address_code'] = $addressData['address_code'] ?? null;
+            }
 
             $data['address']        = $addressData['formatted_address'] ?? ($data['address'] ?? null);
             $data['state']          = $addressData['state'] ?? ($data['state'] ?? null);
@@ -61,8 +86,13 @@ class EditCompanyAddress extends EditRecord
             $data['postal_code']    = $addressData['postal_code'] ?? ($data['postal_code'] ?? null);
             $data['country']        = $addressData['country'] ?? ($data['country'] ?? null);
         } catch (\Exception $e) {
-            Log::error('ShipBubble Error: ' . $e->getMessage());
-            $this->addError('shipping', $e->getMessage());
+            Log::error('ShipBubble Error: '.$e->getMessage());
+
+            Notification::make()
+                ->danger()
+                ->title('Could not verify this address with ShipBubble')
+                ->body('Your changes were saved, but shipping validation failed (the courier API may be temporarily unavailable). Save again to retry.')
+                ->send();
         }
 
         return $data;

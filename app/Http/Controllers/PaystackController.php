@@ -73,12 +73,22 @@ class PaystackController extends Controller
     {
         $order = $payment->order()->with('items', 'address', 'user')->first();
 
-        if ($order->address && $order->address->email) {
-            Mail::to($order->address->email)->send(new OrderPlaced($order));
-        } elseif ($order->user) {
-            Mail::to($order->user->email)->send(new OrderPlaced($order));
-        } else {
+        $recipient = $order->address->email ?? $order->user?->email;
+
+        if (! $recipient) {
             Log::warning("Order {$order->id} has no address email or user - skipping order confirmation email.");
+
+            return;
+        }
+
+        // Mail delivery failures (SMTP outages, cert issues, etc.) must never
+        // fail the checkout request - the payment is already confirmed at this
+        // point, so a mail error here should just be logged, not surfaced as a
+        // 500 to the customer.
+        try {
+            Mail::to($recipient)->send(new OrderPlaced($order));
+        } catch (\Throwable $e) {
+            Log::error("Failed to send order confirmation email for order {$order->id}: {$e->getMessage()}");
         }
     }
 }

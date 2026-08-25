@@ -94,7 +94,10 @@
                         </div>
                         <div class="mt-8 flex gap-3">
                             <button type="button" wire:click="previousStep" class="rtw-btn-secondary">Back</button>
-                            <button type="button" wire:click="nextStep" class="rtw-btn-primary">Continue to Shipping</button>
+                            <button type="button" wire:click="nextStep" wire:loading.attr="disabled" class="rtw-btn-primary">
+                                <span wire:loading.remove wire:target="nextStep">Continue to Shipping</span>
+                                <span wire:loading wire:target="nextStep">Checking courier rates&hellip;</span>
+                            </button>
                         </div>
                     </div>
                 @endif
@@ -103,26 +106,37 @@
                 @if ($step === 3)
                     <div>
                         <h2 class="font-serif text-2xl">Delivery Method</h2>
+
+                        @if ($shippingError)
+                            <div class="mt-4 border border-red-200 bg-red-50 p-4">
+                                <p class="text-xs text-red-700">{{ $shippingError }}</p>
+                                <button type="button" wire:click="retryShipping" wire:loading.attr="disabled" class="mt-2 text-xs font-medium underline">
+                                    <span wire:loading.remove wire:target="retryShipping">Retry</span>
+                                    <span wire:loading wire:target="retryShipping">Checking&hellip;</span>
+                                </button>
+                            </div>
+                        @endif
+
                         <div class="mt-6 space-y-3">
-                            @foreach ($shippingMethods as $method)
+                            @foreach ($liveCouriers as $index => $courier)
                                 <label class="flex cursor-pointer items-center justify-between border border-neutral-300 p-4 has-[:checked]:border-black">
                                     <span class="flex items-center gap-3">
-                                        <input type="radio" wire:model="shipping_method_id" value="{{ $method->id }}" class="text-black focus:ring-black">
+                                        <input type="radio" wire:model="selectedCourierIndex" value="{{ $index }}" class="text-black focus:ring-black">
                                         <span>
-                                            <span class="block text-sm font-medium">{{ $method->name }}</span>
-                                            @if ($method->estimated_delivery)
-                                                <span class="block text-xs text-neutral-500">{{ $method->estimated_delivery }}</span>
+                                            <span class="block text-sm font-medium">{{ $courier['courier_name'] ?? 'Courier' }}</span>
+                                            @if (! empty($courier['delivery_eta_time']))
+                                                <span class="block text-xs text-neutral-500">Delivery by {{ $courier['delivery_eta_time'] }}</span>
                                             @endif
                                         </span>
                                     </span>
-                                    <span class="text-sm">{{ $currency->formatForDisplay($method->cost, $activeCurrency) }}</span>
+                                    <span class="text-sm">{{ $currency->formatForDisplay($courier['display_amount'] ?? 0, $activeCurrency) }}</span>
                                 </label>
                             @endforeach
-                            @error('shipping_method_id') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+                            @error('selectedCourierIndex') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
                         </div>
                         <div class="mt-8 flex gap-3">
                             <button type="button" wire:click="previousStep" class="rtw-btn-secondary">Back</button>
-                            <button type="button" wire:click="nextStep" class="rtw-btn-primary">Continue to Payment</button>
+                            <button type="button" wire:click="nextStep" wire:loading.attr="disabled" @if (! count($liveCouriers)) disabled @endif class="rtw-btn-primary">Continue to Payment</button>
                         </div>
                     </div>
                 @endif

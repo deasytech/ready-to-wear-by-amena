@@ -45,6 +45,16 @@
 
             {{-- Icons --}}
             <div class="flex items-center justify-end gap-1 lg:flex-1">
+                <div class="hidden items-center lg:flex">
+                    <label for="header-currency-select" class="sr-only">Currency</label>
+                    <select id="header-currency-select" wire:change="changeCurrency($event.target.value)"
+                        class="rtw-focus cursor-pointer border-0 bg-transparent py-2 pr-6 pl-2 text-xs font-medium tracking-widest uppercase">
+                        @foreach ($currencies as $code => $config)
+                            <option value="{{ $code }}" @selected($code === $currentCurrency)>{{ $code }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <button type="button" class="rtw-focus flex size-10 items-center justify-center" aria-label="Search"
                     @click="searchOpen = true">
                     <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24"
@@ -136,7 +146,17 @@
                 <a href="{{ auth()->check() ? route('account.overview') : route('login') }}" wire:navigate
                     class="border-b border-neutral-100 py-4 text-sm font-medium tracking-wide uppercase">Account</a>
                 <a href="{{ route('wishlist.index') }}" wire:navigate
-                    class="py-4 text-sm font-medium tracking-wide uppercase">Wishlist</a>
+                    class="border-b border-neutral-100 py-4 text-sm font-medium tracking-wide uppercase">Wishlist</a>
+
+                <div class="flex items-center gap-3 py-4">
+                    <label for="mobile-currency-select" class="text-sm font-medium tracking-wide uppercase">Currency</label>
+                    <select id="mobile-currency-select" wire:change="changeCurrency($event.target.value)"
+                        class="rtw-focus cursor-pointer border border-neutral-300 py-1.5 pr-6 pl-2 text-xs font-medium tracking-widest uppercase">
+                        @foreach ($currencies as $code => $config)
+                            <option value="{{ $code }}" @selected($code === $currentCurrency)>{{ $code }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </nav>
         </div>
     </div>

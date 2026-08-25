@@ -5,18 +5,18 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\ShippingMethod;
 use App\Models\User;
 use App\Services\CartService;
 use Livewire\Livewire;
 
 it('places a cash-on-delivery order and decrements stock', function () {
+    fakeShipBubble();
+
     $user = User::factory()->create();
     $this->actingAs($user);
 
     $product = Product::factory()->for(Category::factory())->create(['price' => 50000]);
     $variant = ProductVariant::factory()->for($product)->create(['stock' => 5]);
-    $shippingMethod = ShippingMethod::factory()->create(['cost' => 2500]);
 
     app(CartService::class)->addItem($product, $variant, 2);
 
@@ -31,7 +31,6 @@ it('places a cash-on-delivery order and decrements stock', function () {
         ->set('state', 'Lagos')
         ->set('country', 'Nigeria')
         ->call('nextStep')
-        ->set('shipping_method_id', $shippingMethod->id)
         ->call('nextStep')
         ->set('payment_method', 'cod')
         ->call('nextStep')
@@ -54,7 +53,6 @@ it('prevents ordering more than available stock', function () {
 
     $product = Product::factory()->for(Category::factory())->create(['price' => 50000]);
     $variant = ProductVariant::factory()->for($product)->create(['stock' => 1]);
-    $shippingMethod = ShippingMethod::factory()->create();
 
     $cartService = app(CartService::class);
     $cartService->addItem($product, $variant, 1);
@@ -71,7 +69,10 @@ it('prevents ordering more than available stock', function () {
         ->set('city', 'Lekki')
         ->set('state', 'Lagos')
         ->set('country', 'Nigeria')
-        ->set('shipping_method_id', $shippingMethod->id)
+        ->set('liveCouriers', [
+            ['courier_name' => 'Fake Courier', 'display_amount' => 2500, 'display_currency' => 'NGN'],
+        ])
+        ->set('selectedCourierIndex', 0)
         ->set('payment_method', 'cod')
         ->set('step', 5)
         ->call('placeOrder')

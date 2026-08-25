@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -18,29 +19,60 @@ class ShipBubbleService
     }
 
     /**
-     * Package categories used to describe what is being shipped.
-     * Falls back to a static fashion-relevant list if the API is unreachable,
-     * so the admin Product form never hard-crashes in local/dev environments.
+     * Package categories used to describe what is being shipped. ShipBubble
+     * assigns each category a large, account-agnostic numeric id (e.g.
+     * "Fashion wears" = 74794423) - these are NOT small sequential ids, and
+     * fetch_rates rejects anything else with a 422 "Invalid package category
+     * selected". Cached for a while since this list rarely changes, and only
+     * the successful response is cached - a transient failure always retries
+     * fresh next time rather than getting stuck on the fallback.
      */
     public function getPackageCategories(): array
     {
+        $cached = Cache::get('shipbubble.package_categories');
+
+        if ($cached) {
+            return $cached;
+        }
+
         try {
             $response = $this->client()->get("{$this->baseUrl}/shipping/labels/categories");
 
             if ($response->successful()) {
-                return $response->json();
+                $data = $response->json();
+                Cache::put('shipbubble.package_categories', $data, now()->addHours(6));
+
+                return $data;
             }
         } catch (\Throwable $e) {
             Log::warning('ShipBubble getPackageCategories failed: '.$e->getMessage());
         }
 
+        // Real category ids from ShipBubble's catalogue, used only when the
+        // categories endpoint itself is unreachable. These must stay real
+        // ids (not placeholders) since an invented id breaks fetch_rates.
         return [
             'data' => [
-                ['category_id' => 1, 'category' => 'Fashion & Clothing'],
-                ['category_id' => 2, 'category' => 'Shoes & Accessories'],
-                ['category_id' => 3, 'category' => 'General Merchandise'],
+                ['category_id' => 74794423, 'category' => 'Fashion wears'],
+                ['category_id' => 99652979, 'category' => 'Health and beauty'],
+                ['category_id' => 20754594, 'category' => 'Light weight items'],
             ],
         ];
+    }
+
+    /**
+     * A real category_id to use when a product hasn't been assigned one.
+     * Prefers a fashion-related category (this store's default), falling
+     * back to whatever category comes back first - never invents an id.
+     */
+    public function resolveDefaultCategoryId(): ?int
+    {
+        $categories = collect($this->getPackageCategories()['data'] ?? []);
+
+        $category = $categories->first(fn ($c) => str_contains(strtolower($c['category'] ?? ''), 'fashion'))
+            ?? $categories->first();
+
+        return isset($category['category_id']) ? (int) $category['category_id'] : null;
     }
 
     /**
@@ -98,13 +130,13 @@ class ShipBubbleService
 
     /**
      * Fetch live courier rates for a shipment. Returns an empty rate list
-     * (rather than throwing) so checkout can fall back to the flat-rate
-     * shipping methods configured in the admin.
+     * (rather than throwing) so the caller can show its own "no rates
+     * available" state instead of a hard failure.
      */
     public function getRates(array $payload): array
     {
         try {
-            $response = $this->client()->post("{$this->baseUrl}/shipping/labels/rates", $payload);
+            $response = $this->client()->post("{$this->baseUrl}/shipping/fetch_rates", $payload);
 
             if ($response->successful()) {
                 return $response->json();
@@ -116,8 +148,21 @@ class ShipBubbleService
         return ['data' => ['couriers' => []]];
     }
 
+    /**
+     * A transient network blip (timeout, connection reset) against an
+     * external API shouldn't fail an admin action outright, so connection-
+     * level failures and 5xx responses get a couple of quick retries. A 4xx
+     * means the payload itself was rejected, so retrying it is pointless -
+     * only the network/server error classes are retried.
+     */
     protected function client()
     {
-        return Http::withToken($this->apiKey)->acceptJson()->timeout(10);
+        return Http::withToken($this->apiKey)
+            ->acceptJson()
+            ->timeout(20)
+            ->retry(2, 500, function (\Throwable $e) {
+                return $e instanceof \Illuminate\Http\Client\ConnectionException
+                    || ($e instanceof \Illuminate\Http\Client\RequestException && $e->response->serverError());
+            }, throw: false);
     }
 }

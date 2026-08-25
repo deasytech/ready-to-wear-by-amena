@@ -45,3 +45,61 @@ function something()
 {
     // ..
 }
+
+/**
+ * Fake ShipBubble's address-validation and rate-fetching endpoints, and seed
+ * a pickup CompanyAddress, so checkout tests can reach step 3 without hitting
+ * the real ShipBubble API.
+ */
+function fakeShipBubble(): void
+{
+    \App\Models\CompanyAddress::create([
+        'name' => 'RTW Warehouse',
+        'email' => 'warehouse@example.com',
+        'phone' => '+2348000000000',
+        'address' => '1 Warehouse Road, Lagos',
+        'address_code' => 111,
+    ]);
+
+    \Illuminate\Support\Facades\Http::fake([
+        '*/shipping/labels/categories' => \Illuminate\Support\Facades\Http::response([
+            'status' => 'success',
+            'data' => [
+                ['category_id' => 74794423, 'category' => 'Fashion wears'],
+            ],
+        ], 200),
+        '*/shipping/address/validate' => \Illuminate\Support\Facades\Http::response([
+            'status' => true,
+            'message' => 'Address validated',
+            'data' => [
+                'address_code' => 222,
+                'formatted_address' => '10 Admiralty Way, Lekki, Lagos',
+                'city' => 'Lekki',
+                'state' => 'Lagos',
+                'country' => 'Nigeria',
+                'postal_code' => '101245',
+                'latitude' => 6.4,
+                'longitude' => 3.4,
+            ],
+        ], 200),
+        '*/shipping/fetch_rates' => \Illuminate\Support\Facades\Http::response([
+            'status' => 'success',
+            'message' => 'Retrieved successfully',
+            'data' => [
+                'request_token' => 'fake-request-token',
+                'couriers' => [
+                    [
+                        'courier_id' => 1,
+                        'courier_name' => 'Fake Courier',
+                        'rate_card_amount' => 2500,
+                        'total' => 2500,
+                        'currency' => 'NGN',
+                        'service_code' => 'fake-standard',
+                        'service_type' => 'pickup',
+                        'delivery_eta_time' => '2 days',
+                    ],
+                ],
+            ],
+        ], 200),
+    ]);
+}

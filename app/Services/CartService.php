@@ -62,7 +62,7 @@ class CartService
             throw new \RuntimeException('Not enough stock available for this selection.');
         }
 
-        $unitPrice = $variant?->price_override ?? $product->getPriceForCurrency($cart->currency);
+        $unitPrice = $variant?->getPriceOverrideForCurrency($cart->currency) ?? $product->getPriceForCurrency($cart->currency);
 
         if ($existing) {
             $existing->update(['quantity' => $desiredQuantity, 'unit_price' => $unitPrice]);
@@ -76,6 +76,25 @@ class CartService
             'quantity' => $quantity,
             'unit_price' => $unitPrice,
         ]);
+    }
+
+    /**
+     * Switch a cart to a new currency and reprice every line item against it,
+     * so a currency change is reflected immediately rather than only for
+     * items added afterwards.
+     */
+    public function syncCurrency(Cart $cart, string $currency): void
+    {
+        if ($cart->currency === $currency) {
+            return;
+        }
+
+        $cart->update(['currency' => $currency]);
+
+        foreach ($cart->items()->with('product', 'variant')->get() as $item) {
+            $unitPrice = $item->variant?->getPriceOverrideForCurrency($currency) ?? $item->product->getPriceForCurrency($currency);
+            $item->update(['unit_price' => $unitPrice]);
+        }
     }
 
     public function updateQuantity(CartItem $item, int $quantity): CartItem

@@ -91,7 +91,7 @@ class Show extends Component
 
         return view('livewire.shop.show', [
             'activeCurrency' => $activeCurrency,
-            'price' => $this->selectedVariant?->price_override ?? $this->product->getPriceForCurrency($activeCurrency),
+            'price' => $this->selectedVariant?->getPriceOverrideForCurrency($activeCurrency) ?? $this->product->getPriceForCurrency($activeCurrency),
             'isAvailable' => $this->isAvailable,
             'relatedProducts' => Product::query()
                 ->active()

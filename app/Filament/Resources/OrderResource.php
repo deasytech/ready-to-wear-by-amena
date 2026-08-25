@@ -14,6 +14,12 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Infolists\Components\Section as InfolistSection;
+use Filament\Infolists\Components\Split;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
@@ -155,6 +161,64 @@ class OrderResource extends Resource
             ]);
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                InfolistSection::make('Order Information')
+                    ->schema([
+                        TextEntry::make('id')->label('Order #'),
+                        TextEntry::make('user.name')->label('Customer')->placeholder('Guest'),
+                        TextEntry::make('status')->badge(),
+                        TextEntry::make('payment_method'),
+                        TextEntry::make('payment_status')->badge(),
+                        TextEntry::make('currency'),
+                        TextEntry::make('shippingMethod.name')
+                            ->label('Shipping Method')
+                            ->formatStateUsing(fn ($state, $record) => $state ?? $record->shipping_method)
+                            ->placeholder('—'),
+                        TextEntry::make('grand_total')->money(fn ($record) => $record->currency ?? 'NGN'),
+                        TextEntry::make('notes')->columnSpanFull()->placeholder('—'),
+                    ])
+                    ->columns(3),
+                InfolistSection::make('Order Items')
+                    ->schema([
+                        RepeatableEntry::make('items')
+                            ->label('')
+                            ->schema([
+                                Split::make([
+                                    ImageEntry::make('product.first_image')
+                                        ->label('')
+                                        ->size(64)
+                                        ->square(),
+                                    TextEntry::make('name')
+                                        ->label('Product')
+                                        ->html()
+                                        ->formatStateUsing(function ($state, $record) {
+                                            $meta = collect([
+                                                $record->size ? "Size: {$record->size}" : null,
+                                                $record->color ? "Color: {$record->color}" : null,
+                                                $record->sku ? "SKU: {$record->sku}" : null,
+                                            ])->filter()->implode(' · ');
+
+                                            $html = '<span class="font-semibold">'.e($state).'</span>';
+
+                                            if ($meta !== '') {
+                                                $html .= '<span class="block text-xs text-gray-500">'.e($meta).'</span>';
+                                            }
+
+                                            return $html;
+                                        }),
+                                    TextEntry::make('quantity')->label('Qty'),
+                                    TextEntry::make('unit_amount')->label('Unit Price')->money(fn ($record) => $record->order->currency ?? 'NGN'),
+                                    TextEntry::make('total_amount')->label('Total')->money(fn ($record) => $record->order->currency ?? 'NGN'),
+                                ])->from('md'),
+                            ])
+                            ->contained(false),
+                    ]),
+            ]);
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -185,6 +249,7 @@ class OrderResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('shippingMethod.name')
                     ->label('Shipping')
+                    ->formatStateUsing(fn ($state, $record) => $state ?? $record->shipping_method)
                     ->searchable(),
                 Tables\Columns\SelectColumn::make('status')
                     ->options(Order::STATUSES),
