@@ -102,7 +102,10 @@ class OrderResource extends Resource
                             ->label('Shipping Method')
                             ->relationship('shippingMethod', 'name')
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->helperText(fn ($record) => $record && ! $record->shipping_method_id && $record->shipping_method
+                                ? 'Courier selected at checkout: '.$record->shipping_method
+                                : null),
                         Forms\Components\Textarea::make('notes')
                             ->columnSpanFull(),
                     ])->columns(2),
