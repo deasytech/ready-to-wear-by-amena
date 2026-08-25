@@ -3,15 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Mail\OrderPlaced;
+use App\Models\Order;
 use App\Models\Payment;
+use App\Services\OrderService;
 use App\Services\PaymentService;
+use App\Services\ShipBubbleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class PaystackController extends Controller
 {
-    public function handleCallback(Request $request, PaymentService $paymentService)
+    public function handleCallback(Request $request, PaymentService $paymentService, OrderService $orderService, ShipBubbleService $shipBubble)
     {
         $reference = $request->query('reference');
 
@@ -31,7 +34,7 @@ class PaystackController extends Controller
         }
 
         if (! $wasAlreadyPaid) {
-            $this->sendConfirmation($payment);
+            $this->handlePaymentConfirmed($payment, $orderService, $shipBubble);
         }
 
         session(['success_order_id' => $payment->order_id]);
@@ -44,7 +47,7 @@ class PaystackController extends Controller
      * callback so a payment is still confirmed if the customer closes the tab
      * before the redirect completes.
      */
-    public function handleWebhook(Request $request, PaymentService $paymentService)
+    public function handleWebhook(Request $request, PaymentService $paymentService, OrderService $orderService, ShipBubbleService $shipBubble)
     {
         $signature = $request->header('x-paystack-signature');
         $secret = config('services.paystack.secret_key');
@@ -62,17 +65,29 @@ class PaystackController extends Controller
             $payment = $paymentService->completePayment($reference);
 
             if ($payment && $payment->status === 'paid' && ! $wasAlreadyPaid) {
-                $this->sendConfirmation($payment);
+                $this->handlePaymentConfirmed($payment, $orderService, $shipBubble);
             }
         }
 
         return response()->noContent();
     }
 
-    protected function sendConfirmation(Payment $payment): void
+    /**
+     * Runs once, the first time a payment is confirmed as paid (guarded by
+     * $wasAlreadyPaid in both callers) - books the shipment with ShipBubble
+     * and sends the order confirmation email.
+     */
+    protected function handlePaymentConfirmed(Payment $payment, OrderService $orderService, ShipBubbleService $shipBubble): void
     {
         $order = $payment->order()->with('items', 'address', 'user')->first();
 
+        $orderService->bookShipment($order, $shipBubble);
+
+        $this->sendConfirmation($order);
+    }
+
+    protected function sendConfirmation(Order $order): void
+    {
         $recipient = $order->address->email ?? $order->user?->email;
 
         if (! $recipient) {

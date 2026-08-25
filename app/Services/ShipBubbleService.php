@@ -149,6 +149,36 @@ class ShipBubbleService
     }
 
     /**
+     * Book an actual shipment against a previously fetched rate. The
+     * request_token comes from getRates() and is single-use, tied to that
+     * specific rate quote - service_code/courier_id identify which of the
+     * quoted couriers was picked.
+     *
+     * @throws \Illuminate\Http\Client\RequestException
+     */
+    public function createShipment(array $payload): array
+    {
+        return $this->client()
+            ->post("{$this->baseUrl}/shipping/labels", $payload)
+            ->throw()
+            ->json();
+    }
+
+    /**
+     * Verify the x-ship-signature header ShipBubble sends with webhook
+     * requests: an HMAC-SHA512 hash of the raw request body, signed with the
+     * same API key used for authenticating requests to them.
+     */
+    public function verifyWebhookSignature(string $payload, ?string $signature): bool
+    {
+        if (! $signature || ! $this->apiKey) {
+            return false;
+        }
+
+        return hash_equals(hash_hmac('sha512', $payload, $this->apiKey), $signature);
+    }
+
+    /**
      * A transient network blip (timeout, connection reset) against an
      * external API shouldn't fail an admin action outright, so connection-
      * level failures and 5xx responses get a couple of quick retries. A 4xx

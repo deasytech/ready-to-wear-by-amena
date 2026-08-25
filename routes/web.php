@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PaystackController;
+use App\Http\Controllers\ShipBubbleWebhookController;
 use App\Livewire\Account\Addresses;
 use App\Livewire\Account\Orders;
 use App\Livewire\Account\OrderShow;
@@ -38,6 +39,8 @@ Route::get('/wishlist', WishlistPage::class)->name('wishlist.index');
 
 Route::get('/paystack/callback', [PaystackController::class, 'handleCallback'])->name('paystack.callback');
 Route::post('/paystack/webhook', [PaystackController::class, 'handleWebhook'])->name('paystack.webhook');
+
+Route::post('/shipbubble/webhook', [ShipBubbleWebhookController::class, 'handle'])->name('shipbubble.webhook');
 
 Route::view('/about', 'pages.about')->name('pages.about');
 Route::view('/contact', 'pages.contact')->name('pages.contact');

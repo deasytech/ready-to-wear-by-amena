@@ -45,6 +45,9 @@ class Order extends Model
         'discount_code_id',
         'shipment_id',
         'tracking_url',
+        'shipbubble_request_token',
+        'shipbubble_service_code',
+        'shipbubble_courier_id',
         'notes',
     ];
 

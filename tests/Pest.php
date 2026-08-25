@@ -101,5 +101,14 @@ function fakeShipBubble(): void
                 ],
             ],
         ], 200),
+        '*/shipping/labels' => \Illuminate\Support\Facades\Http::response([
+            'status' => 'success',
+            'message' => 'Order successfully routed to Fake Courier',
+            'data' => [
+                'order_id' => 'SB-FAKE12345',
+                'status' => 'pending',
+                'tracking_url' => 'https://shipbubble.test/tracking/SB-FAKE12345',
+            ],
+        ], 200),
     ]);
 }

@@ -53,6 +53,10 @@ class CheckoutFlow extends Component
 
     public ?string $shippingError = null;
 
+    // A fetch_rates request_token is single-use and tied to that specific
+    // quote - needed later to actually book the chosen courier.
+    public ?string $shippingRequestToken = null;
+
     // Step 4: payment
     public string $payment_method = 'paystack';
 
@@ -145,6 +149,7 @@ class CheckoutFlow extends Component
         $this->liveCouriers = [];
         $this->selectedCourierIndex = null;
         $this->shippingError = null;
+        $this->shippingRequestToken = null;
 
         $pickup = CompanyAddress::whereNotNull('address_code')->first();
 
@@ -226,6 +231,8 @@ class CheckoutFlow extends Component
                 return;
             }
 
+            $this->shippingRequestToken = $rates['data']['request_token'] ?? null;
+
             // ShipBubble always quotes in NGN - convert each rate into the cart's
             // active currency so what the customer picks matches what they've
             // been shopping in.
@@ -278,7 +285,13 @@ class CheckoutFlow extends Component
             'currency' => $courier['display_currency'] ?? 'NGN',
         ]);
 
-        return ['cost' => $cost, 'shippingMethod' => $shippingMethod];
+        return [
+            'cost' => $cost,
+            'shippingMethod' => $shippingMethod,
+            'requestToken' => $this->shippingRequestToken,
+            'serviceCode' => $courier['service_code'] ?? null,
+            'courierId' => $courier['courier_id'] ?? null,
+        ];
     }
 
     public function previousStep(): void
@@ -307,7 +320,7 @@ class CheckoutFlow extends Component
         }
     }
 
-    public function placeOrder(CartService $cartService, OrderService $orderService, PaymentService $paymentService): void
+    public function placeOrder(CartService $cartService, OrderService $orderService, PaymentService $paymentService, ShipBubbleService $shipBubble): void
     {
         $this->validate(array_merge(
             $this->rulesForStep(1),
@@ -355,7 +368,12 @@ class CheckoutFlow extends Component
                 $shippingMethod,
                 $discountCode,
                 $this->payment_method,
-                ['notes' => $this->notes]
+                [
+                    'notes' => $this->notes,
+                    'shipbubble_request_token' => $resolvedShipping['requestToken'],
+                    'shipbubble_service_code' => $resolvedShipping['serviceCode'],
+                    'shipbubble_courier_id' => $resolvedShipping['courierId'],
+                ]
             );
         } catch (\RuntimeException $e) {
             $this->addError('stock', $e->getMessage());
@@ -366,6 +384,8 @@ class CheckoutFlow extends Component
         if ($this->payment_method === 'cod') {
             $order->update(['status' => 'confirmed']);
             session(['success_order_id' => $order->id]);
+
+            $orderService->bookShipment($order, $shipBubble);
 
             try {
                 Mail::to($this->email)->send(new OrderPlaced($order));

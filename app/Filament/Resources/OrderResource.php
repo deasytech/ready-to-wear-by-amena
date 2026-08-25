@@ -6,6 +6,8 @@ use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers\AddressRelationManager;
 use App\Models\Order;
 use App\Models\Product;
+use App\Services\OrderService;
+use App\Services\ShipBubbleService;
 use Filament\Forms;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
@@ -14,12 +16,14 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Filament\Infolists\Components\Actions\Action as InfolistAction;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\Split;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
@@ -181,6 +185,37 @@ class OrderResource extends Resource
                         TextEntry::make('notes')->columnSpanFull()->placeholder('—'),
                     ])
                     ->columns(3),
+                InfolistSection::make('Shipment')
+                    ->schema([
+                        TextEntry::make('shipment_id')
+                            ->label('ShipBubble Shipment')
+                            ->placeholder('Not booked yet'),
+                        TextEntry::make('tracking_url')
+                            ->label('Tracking')
+                            ->placeholder('—')
+                            ->url(fn ($record) => $record->tracking_url)
+                            ->openUrlInNewTab()
+                            ->formatStateUsing(fn ($state) => $state ? 'Track shipment' : null),
+                    ])
+                    ->columns(2)
+                    ->visible(fn ($record) => filled($record->shipbubble_request_token))
+                    ->headerActions([
+                        InfolistAction::make('bookShipment')
+                            ->label('Book shipment')
+                            ->icon('heroicon-m-truck')
+                            ->visible(fn ($record) => blank($record->shipment_id) && filled($record->shipbubble_request_token))
+                            ->action(function ($record) {
+                                app(OrderService::class)->bookShipment($record, app(ShipBubbleService::class));
+
+                                $record->refresh();
+
+                                Notification::make()
+                                    ->title($record->shipment_id ? 'Shipment booked' : 'Booking failed')
+                                    ->body($record->shipment_id ? "Tracking: {$record->tracking_url}" : 'Check the logs for details - the courier API may be unavailable or the rate quote may have expired.')
+                                    ->status($record->shipment_id ? 'success' : 'danger')
+                                    ->send();
+                            }),
+                    ]),
                 InfolistSection::make('Order Items')
                     ->schema([
                         RepeatableEntry::make('items')
@@ -251,6 +286,10 @@ class OrderResource extends Resource
                     ->label('Shipping')
                     ->formatStateUsing(fn ($state, $record) => $state ?? $record->shipping_method)
                     ->searchable(),
+                Tables\Columns\TextColumn::make('shipment_id')
+                    ->label('Shipment')
+                    ->placeholder('Not booked')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\SelectColumn::make('status')
                     ->options(Order::STATUSES),
                 Tables\Columns\TextColumn::make('created_at')

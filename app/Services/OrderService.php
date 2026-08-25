@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\ProductVariant;
 use App\Models\ShippingMethod;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderService
 {
@@ -71,6 +72,9 @@ class OrderService
                 'shipping_method_id' => $shippingMethod->id,
                 'discount_code_id' => $discountCode?->id,
                 'notes' => $orderMeta['notes'] ?? null,
+                'shipbubble_request_token' => $orderMeta['shipbubble_request_token'] ?? null,
+                'shipbubble_service_code' => $orderMeta['shipbubble_service_code'] ?? null,
+                'shipbubble_courier_id' => $orderMeta['shipbubble_courier_id'] ?? null,
             ]);
 
             $order->addresses()->create([
@@ -111,5 +115,40 @@ class OrderService
 
             return $order->fresh(['items', 'address']);
         });
+    }
+
+    /**
+     * Book the actual shipment with ShipBubble for an order that already has
+     * a chosen courier rate (request_token/service_code/courier_id captured
+     * at checkout). Idempotent, so it's safe to call from every payment
+     * confirmation path (browser callback, webhook, COD) or a manual admin
+     * retry - it only ever books once per order.
+     */
+    public function bookShipment(Order $order, ShipBubbleService $shipBubble): void
+    {
+        if ($order->shipment_id) {
+            return;
+        }
+
+        if (! $order->shipbubble_request_token || ! $order->shipbubble_service_code || ! $order->shipbubble_courier_id) {
+            return;
+        }
+
+        try {
+            $result = $shipBubble->createShipment([
+                'request_token' => $order->shipbubble_request_token,
+                'service_code' => $order->shipbubble_service_code,
+                'courier_id' => $order->shipbubble_courier_id,
+            ]);
+
+            $data = $result['data'] ?? $result;
+
+            $order->update([
+                'shipment_id' => $data['order_id'] ?? null,
+                'tracking_url' => $data['tracking_url'] ?? null,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error("Failed to book ShipBubble shipment for order {$order->id}: {$e->getMessage()}");
+        }
     }
 }
