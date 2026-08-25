@@ -2,10 +2,6 @@
 
 use App\Http\Controllers\PaystackController;
 use App\Http\Controllers\ShipBubbleWebhookController;
-use App\Livewire\Account\Addresses;
-use App\Livewire\Account\Orders;
-use App\Livewire\Account\OrderShow;
-use App\Livewire\Account\Overview;
 use App\Livewire\Cart\Bag;
 use App\Livewire\Checkout\Cancel;
 use App\Livewire\Checkout\CheckoutFlow;
@@ -18,6 +14,10 @@ use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Shop\Index as ShopIndex;
 use App\Livewire\Shop\Show as ProductShow;
+use App\Livewire\UserDashboard\Addresses;
+use App\Livewire\UserDashboard\OrderShow;
+use App\Livewire\UserDashboard\Orders;
+use App\Livewire\UserDashboard\Overview;
 use App\Livewire\Wishlist\WishlistPage;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -48,11 +48,11 @@ Route::view('/shipping-returns', 'pages.shipping-returns')->name('pages.shipping
 Route::view('/privacy-policy', 'pages.privacy-policy')->name('pages.privacy-policy');
 Route::view('/terms-conditions', 'pages.terms-conditions')->name('pages.terms-conditions');
 
-Route::middleware(['auth'])->prefix('account')->name('account.')->group(function () {
-    Route::get('/', Overview::class)->name('overview');
-    Route::get('/addresses', Addresses::class)->name('addresses');
+Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(function () {
+    Route::get('/', Overview::class)->name('index');
     Route::get('/orders', Orders::class)->name('orders');
     Route::get('/orders/{order}', OrderShow::class)->name('orders.show');
+    Route::get('/addresses', Addresses::class)->name('addresses');
 });
 
 Route::middleware(['auth'])->group(function () {

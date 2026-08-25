@@ -59,14 +59,14 @@ it('returns search results', function () {
 });
 
 it('redirects guests away from the account area', function () {
-    $this->get(route('account.overview'))->assertRedirect(route('login'));
+    $this->get(route('dashboard.index'))->assertRedirect(route('login'));
 });
 
 it('lets authenticated customers view their account overview', function () {
     $user = User::factory()->create();
 
     $this->actingAs($user)
-        ->get(route('account.overview'))
+        ->get(route('dashboard.index'))
         ->assertOk()
         ->assertSee('Welcome back');
 });
@@ -74,8 +74,8 @@ it('lets authenticated customers view their account overview', function () {
 it('lets authenticated customers view order history and addresses', function () {
     $user = User::factory()->create();
 
-    $this->actingAs($user)->get(route('account.orders'))->assertOk();
-    $this->actingAs($user)->get(route('account.addresses'))->assertOk();
+    $this->actingAs($user)->get(route('dashboard.orders'))->assertOk();
+    $this->actingAs($user)->get(route('dashboard.addresses'))->assertOk();
 });
 
 it('renders the auth pages with rtw branding', function () {
@@ -83,7 +83,7 @@ it('renders the auth pages with rtw branding', function () {
     $this->get(route('register'))->assertOk();
 });
 
-it('renders account settings pages in the storefront layout', function () {
+it('renders account settings pages in the dashboard layout', function () {
     $user = User::factory()->create();
 
     $this->actingAs($user)->get(route('settings.profile'))->assertOk()->assertSee('Ready-To-Wear by Amena');

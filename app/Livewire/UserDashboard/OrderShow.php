@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Account;
+namespace App\Livewire\UserDashboard;
 
 use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
@@ -8,7 +8,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Layout('components.layouts.storefront')]
+#[Layout('components.layouts.app')]
 #[Title('Order Details')]
 class OrderShow extends Component
 {
@@ -23,6 +23,8 @@ class OrderShow extends Component
 
     public function render()
     {
-        return view('livewire.account.order-show');
+        $this->order->refresh();
+
+        return view('user-dashboard.order-show');
     }
 }

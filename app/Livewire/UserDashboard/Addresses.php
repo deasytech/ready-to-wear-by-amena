@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Account;
+namespace App\Livewire\UserDashboard;
 
 use App\Models\Address;
 use Illuminate\Support\Facades\Auth;
@@ -9,7 +9,7 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
-#[Layout('components.layouts.storefront')]
+#[Layout('components.layouts.app')]
 #[Title('Saved Addresses')]
 class Addresses extends Component
 {
@@ -72,7 +72,7 @@ class Addresses extends Component
 
     public function render()
     {
-        return view('livewire.account.addresses', [
+        return view('user-dashboard.addresses', [
             'addresses' => Auth::user()->addresses()->whereNull('order_id')->latest()->get(),
         ]);
     }

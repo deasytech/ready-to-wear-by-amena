@@ -9,7 +9,7 @@ use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-#[Layout('components.layouts.storefront')]
+#[Layout('components.layouts.app')]
 class Profile extends Component
 {
     public string $name = '';

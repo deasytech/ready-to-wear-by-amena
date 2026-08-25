@@ -64,7 +64,7 @@
                     </svg>
                 </button>
 
-                <a href="{{ auth()->check() ? route('account.overview') : route('login') }}" wire:navigate
+                <a href="{{ auth()->check() ? route('dashboard.index') : route('login') }}" wire:navigate
                     class="rtw-focus hidden size-10 items-center justify-center lg:flex" aria-label="Account">
                     <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" stroke-width="1.5">
@@ -143,7 +143,7 @@
                 @endforeach
                 <a href="{{ route('pages.about') }}" wire:navigate
                     class="border-b border-neutral-100 py-4 text-sm font-medium tracking-wide uppercase">About</a>
-                <a href="{{ auth()->check() ? route('account.overview') : route('login') }}" wire:navigate
+                <a href="{{ auth()->check() ? route('dashboard.index') : route('login') }}" wire:navigate
                     class="border-b border-neutral-100 py-4 text-sm font-medium tracking-wide uppercase">Account</a>
                 <a href="{{ route('wishlist.index') }}" wire:navigate
                     class="border-b border-neutral-100 py-4 text-sm font-medium tracking-wide uppercase">Wishlist</a>

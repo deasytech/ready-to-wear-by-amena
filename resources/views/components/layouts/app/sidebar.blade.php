@@ -9,30 +9,31 @@
     <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
         <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
-        <a href="{{ route('account.overview') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
+        <a href="{{ route('dashboard.index') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse"
+            wire:navigate>
             <x-app-logo />
         </a>
 
         <flux:navlist variant="outline">
-            <flux:navlist.group :heading="__('Platform')" class="grid">
-                <flux:navlist.item icon="home" :href="route('account.overview')" :current="request()->routeIs('account.overview')"
-                    wire:navigate>{{ __('My Account') }}</flux:navlist.item>
+            <flux:navlist.group :heading="__('Dashboard')" class="grid">
+                <flux:navlist.item icon="home" :href="route('dashboard.index')"
+                    :current="request()->routeIs('dashboard.index')" wire:navigate>{{ __('Overview') }}
+                </flux:navlist.item>
+                <flux:navlist.item icon="shopping-bag" :href="route('dashboard.orders')"
+                    :current="request()->routeIs('dashboard.orders*')" wire:navigate>{{ __('Orders') }}
+                </flux:navlist.item>
+                <flux:navlist.item icon="map-pin" :href="route('dashboard.addresses')"
+                    :current="request()->routeIs('dashboard.addresses')" wire:navigate>{{ __('Addresses') }}
+                </flux:navlist.item>
+                <flux:navlist.item icon="heart" :href="route('wishlist.index')"
+                    :current="request()->routeIs('wishlist.index')" wire:navigate>{{ __('Wishlist') }}
+                </flux:navlist.item>
+                <flux:navlist.item icon="cog" :href="route('settings.profile')"
+                    :current="request()->routeIs('settings.*')" wire:navigate>{{ __('Settings') }}</flux:navlist.item>
             </flux:navlist.group>
         </flux:navlist>
 
         <flux:spacer />
-
-        <flux:navlist variant="outline">
-            <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit"
-                target="_blank">
-                {{ __('Repository') }}
-            </flux:navlist.item>
-
-            <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire"
-                target="_blank">
-                {{ __('Documentation') }}
-            </flux:navlist.item>
-        </flux:navlist>
 
         <!-- Desktop User Menu -->
         <flux:dropdown position="bottom" align="start">
@@ -61,7 +62,8 @@
                 <flux:menu.separator />
 
                 <flux:menu.radio.group>
-                    <flux:menu.item :href="route('settings.profile')" icon="cog" wire:navigate>{{ __('Settings') }}
+                    <flux:menu.item :href="route('settings.profile')" icon="cog" wire:navigate>
+                        {{ __('Settings') }}
                     </flux:menu.item>
                 </flux:menu.radio.group>
 
@@ -108,7 +110,8 @@
                 <flux:menu.separator />
 
                 <flux:menu.radio.group>
-                    <flux:menu.item :href="route('settings.profile')" icon="cog" wire:navigate>{{ __('Settings') }}
+                    <flux:menu.item :href="route('settings.profile')" icon="cog" wire:navigate>
+                        {{ __('Settings') }}
                     </flux:menu.item>
                 </flux:menu.radio.group>
 

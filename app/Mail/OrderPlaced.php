@@ -18,8 +18,8 @@ class OrderPlaced extends Mailable
     public function __construct(public Order $order)
     {
         $this->order->loadMissing('items', 'address');
-        $this->url = \Illuminate\Support\Facades\Route::has('account.orders.show')
-            ? route('account.orders.show', $order)
+        $this->url = \Illuminate\Support\Facades\Route::has('dashboard.orders.show')
+            ? route('dashboard.orders.show', $order)
             : url('/');
     }
 
