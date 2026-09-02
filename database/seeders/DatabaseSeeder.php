@@ -13,8 +13,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::firstOrCreate(
-            ['email' => 'super@admin.com'],
-            ['name' => 'Amena', 'email_verified_at' => now(), 'password' => bcrypt('password')]
+            ['email' => 'admin@readytowearbyamena.com'],
+            ['name' => 'Amena', 'email_verified_at' => now(), 'password' => bcrypt('1!rtwRTW10000')]
         );
 
         $this->call(CatalogSeeder::class);
