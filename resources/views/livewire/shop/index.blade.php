@@ -3,7 +3,7 @@
         <div>
             <p class="rtw-label mb-3">
                 @if ($category)
-                    {{ $categories->firstWhere('slug', $category)?->name ?? 'Shop' }}
+                    {{ $categories->flatMap(fn ($cat) => [$cat, ...$cat->children])->firstWhere('slug', $category)?->name ?? 'Shop' }}
                 @else
                     Shop All
                 @endif
@@ -46,6 +46,17 @@
                                 <button type="button" wire:click="$set('category', '{{ $cat->slug }}')" class="{{ $category === $cat->slug ? 'font-medium text-black' : 'text-neutral-500 hover:text-black' }}">
                                     {{ $cat->name }}
                                 </button>
+                                @if ($cat->children->isNotEmpty())
+                                    <ul class="mt-2 ml-3 space-y-2 border-l border-neutral-200 pl-3">
+                                        @foreach ($cat->children as $child)
+                                            <li>
+                                                <button type="button" wire:click="$set('category', '{{ $child->slug }}')" class="{{ $category === $child->slug ? 'font-medium text-black' : 'text-neutral-500 hover:text-black' }}">
+                                                    {{ $child->name }}
+                                                </button>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @endif
                             </li>
                         @endforeach
                     </ul>
@@ -140,6 +151,9 @@
                         <button type="button" wire:click="$set('category', null)" class="rtw-btn-secondary !px-4 !py-2 {{ ! $category ? '!bg-black !text-white' : '' }}">All</button>
                         @foreach ($categories as $cat)
                             <button type="button" wire:click="$set('category', '{{ $cat->slug }}')" class="rtw-btn-secondary !px-4 !py-2 {{ $category === $cat->slug ? '!bg-black !text-white' : '' }}">{{ $cat->name }}</button>
+                            @foreach ($cat->children as $child)
+                                <button type="button" wire:click="$set('category', '{{ $child->slug }}')" class="rtw-btn-secondary !px-4 !py-2 {{ $category === $child->slug ? '!bg-black !text-white' : '' }}">{{ $child->name }}</button>
+                            @endforeach
                         @endforeach
                     </div>
                 </div>

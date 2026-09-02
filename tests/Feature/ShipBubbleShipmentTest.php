@@ -1,7 +1,6 @@
 <?php
 
 use App\Livewire\Checkout\CheckoutFlow;
-use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductVariant;
@@ -20,7 +19,7 @@ it('books a shipment automatically when a COD order is placed', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $product = Product::factory()->for(Category::factory())->create(['price' => 50000]);
+    $product = Product::factory()->create(['price' => 50000]);
     $variant = ProductVariant::factory()->for($product)->create(['stock' => 5]);
 
     app(CartService::class)->addItem($product, $variant, 1);
@@ -57,7 +56,7 @@ it('books a shipment once payment is confirmed via the paystack callback', funct
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $product = Product::factory()->for(Category::factory())->create(['price' => 50000]);
+    $product = Product::factory()->create(['price' => 50000]);
     $variant = ProductVariant::factory()->for($product)->create(['stock' => 5]);
 
     app(CartService::class)->addItem($product, $variant, 1);

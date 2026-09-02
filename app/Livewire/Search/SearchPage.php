@@ -31,7 +31,7 @@ class SearchPage extends Component
             $results = Product::query()
                 ->active()
                 ->where('name', 'like', '%'.$this->query.'%')
-                ->orWhereHas('category', fn ($q) => $q->where('name', 'like', '%'.$this->query.'%'))
+                ->orWhereHas('categories', fn ($q) => $q->where('name', 'like', '%'.$this->query.'%'))
                 ->paginate(12);
         } else {
             $results = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 12);

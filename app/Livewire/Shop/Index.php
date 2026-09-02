@@ -63,10 +63,15 @@ class Index extends Component
 
     public function render(CurrencyService $currencyService)
     {
-        $query = Product::query()->active()->with('category');
+        $query = Product::query()->active()->with('categories');
 
         if ($this->category) {
-            $query->whereHas('category', fn ($q) => $q->where('slug', $this->category));
+            $selectedCategory = Category::where('slug', $this->category)->first();
+
+            if ($selectedCategory) {
+                $categoryIds = $selectedCategory->selfAndDescendantIds();
+                $query->whereHas('categories', fn ($q) => $q->whereIn('categories.id', $categoryIds));
+            }
         }
 
         if (! empty($this->sizes)) {
@@ -96,7 +101,7 @@ class Index extends Component
 
         return view('livewire.shop.index', [
             'products' => $query->paginate(12),
-            'categories' => Category::active()->whereNull('parent_id')->get(),
+            'categories' => Category::active()->whereNull('parent_id')->with(['children' => fn ($q) => $q->active()])->get(),
             'availableSizes' => Size::active()->orderBy('id')->get(),
             'activeCurrency' => $currencyService->getCurrentCurrency(),
         ]);

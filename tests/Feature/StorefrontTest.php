@@ -6,14 +6,14 @@ use App\Models\Product;
 use App\Models\User;
 
 it('renders the homepage', function () {
-    Product::factory()->for(Category::factory())->create();
+    Product::factory()->create()->categories()->attach(Category::factory()->create());
 
     $this->get(route('home'))->assertOk()->assertSee('Ready-To-Wear by Amena');
 });
 
 it('renders the shop page and filters by category', function () {
     $category = Category::factory()->create(['name' => 'Dresses']);
-    Product::factory()->for($category)->create(['name' => 'The Amara Dress']);
+    Product::factory()->create(['name' => 'The Amara Dress'])->categories()->attach($category);
 
     $this->get(route('shop.index'))->assertOk()->assertSee('The Amara Dress');
 
@@ -22,15 +22,26 @@ it('renders the shop page and filters by category', function () {
         ->assertSee('The Amara Dress');
 });
 
+it('renders the shop page and filters by a parent category to include its subcategories', function () {
+    $parent = Category::factory()->create(['name' => 'Dresses']);
+    $child = Category::factory()->create(['name' => 'Evening Dresses', 'parent_id' => $parent->id]);
+    Product::factory()->create(['name' => 'The Noir Evening Dress'])->categories()->attach($child);
+
+    $this->get(route('shop.index', ['category' => $parent->slug]))
+        ->assertOk()
+        ->assertSee('The Noir Evening Dress');
+});
+
 it('renders a product detail page', function () {
-    $product = Product::factory()->for(Category::factory())->create();
+    $product = Product::factory()->create();
+    $product->categories()->attach(Category::factory()->create());
 
     $this->get(route('products.show', $product))->assertOk()->assertSee($product->name);
 });
 
 it('renders a collection page', function () {
     $collection = Collection::factory()->create();
-    $product = Product::factory()->for(Category::factory())->create();
+    $product = Product::factory()->create();
     $collection->products()->attach($product);
 
     $this->get(route('collections.show', $collection))->assertOk()->assertSee($collection->name);
@@ -53,7 +64,7 @@ it('renders the standalone about page with its own content', function () {
 });
 
 it('returns search results', function () {
-    Product::factory()->for(Category::factory())->create(['name' => 'The Amara Dress']);
+    Product::factory()->create(['name' => 'The Amara Dress']);
 
     $this->get(route('search.index', ['q' => 'Amara']))->assertOk()->assertSee('The Amara Dress');
 });

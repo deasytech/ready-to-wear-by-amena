@@ -127,12 +127,14 @@ class ProductResource extends Resource
                             ->format('mp4'),
                     ]),
                     Section::make('Product Associations')->schema([
-                        Forms\Components\Select::make('category_id')
-                            ->label('Category')
+                        Forms\Components\Select::make('categories')
+                            ->label('Categories')
                             ->required()
+                            ->multiple()
                             ->preload()
                             ->searchable()
-                            ->relationship('category', 'name'),
+                            ->relationship('categories', 'name')
+                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->parent ? "{$record->parent->name} > {$record->name}" : $record->name),
                         Forms\Components\Select::make('colors')
                             ->label('Variant')
                             ->multiple()
@@ -212,8 +214,9 @@ class ProductResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('images.0')
                     ->label('Image'),
-                Tables\Columns\TextColumn::make('category.name')
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('categories.name')
+                    ->label('Categories')
+                    ->badge(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('slug')
@@ -240,9 +243,10 @@ class ProductResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('category_id')
+                SelectFilter::make('categories')
                     ->label('Category')
-                    ->relationship('category', 'name')
+                    ->relationship('categories', 'name')
+                    ->multiple()
                     ->searchable()
                     ->preload(),
                 SelectFilter::make('colors')
@@ -280,7 +284,7 @@ class ProductResource extends Resource
 
     public static function getGloballySearchableAttributes(): array
     {
-        return ['name', 'sizes.name', 'category.name'];
+        return ['name', 'sizes.name', 'categories.name'];
     }
 
     public static function getPages(): array

@@ -11,7 +11,7 @@
             'description' => strip_tags($product->description ?? ''),
             'image' => $product->image_urls,
             'sku' => (string) $product->id,
-            'category' => $product->category?->name,
+            'category' => $product->categories->pluck('name')->implode(', ') ?: null,
             'offers' => [
                 '@type' => 'Offer',
                 'url' => route('products.show', $product),
@@ -25,8 +25,9 @@
     <div class="rtw-container py-6 text-xs tracking-wide text-neutral-500 uppercase">
         <a href="{{ route('shop.index') }}" wire:navigate class="rtw-link-underline">Shop</a>
         <span class="mx-2">/</span>
-        @if ($product->category)
-            <a href="{{ route('shop.index', ['category' => $product->category->slug]) }}" wire:navigate class="rtw-link-underline">{{ $product->category->name }}</a>
+        @if ($product->categories->isNotEmpty())
+            @php $breadcrumbCategory = $product->categories->first(); @endphp
+            <a href="{{ route('shop.index', ['category' => $breadcrumbCategory->slug]) }}" wire:navigate class="rtw-link-underline">{{ $breadcrumbCategory->name }}</a>
             <span class="mx-2">/</span>
         @endif
         <span class="text-black">{{ $product->name }}</span>

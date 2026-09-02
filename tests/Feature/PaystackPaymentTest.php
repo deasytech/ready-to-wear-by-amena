@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductVariant;
@@ -19,7 +18,7 @@ it('redirects to the paystack authorization url when placing an online order', f
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $product = Product::factory()->for(Category::factory())->create(['price' => 30000]);
+    $product = Product::factory()->create(['price' => 30000]);
     $variant = ProductVariant::factory()->for($product)->create(['stock' => 5]);
 
     app(CartService::class)->addItem($product, $variant, 1);

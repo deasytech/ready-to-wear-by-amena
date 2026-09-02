@@ -1,7 +1,6 @@
 <?php
 
 use App\Livewire\Shop\Show;
-use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
 use Livewire\Livewire;
@@ -10,7 +9,7 @@ it('adds a simple product to the cart from the product page', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $product = Product::factory()->for(Category::factory())->create(['in_stock' => true]);
+    $product = Product::factory()->create(['in_stock' => true]);
 
     Livewire::test(Show::class, ['product' => $product])
         ->call('addToBag')
@@ -30,7 +29,7 @@ it('toggles a product in and out of the authenticated wishlist', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $product = Product::factory()->for(Category::factory())->create();
+    $product = Product::factory()->create();
 
     $component = Livewire::test(Show::class, ['product' => $product]);
 

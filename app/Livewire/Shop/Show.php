@@ -23,7 +23,7 @@ class Show extends Component
 
     public function mount(Product $product): void
     {
-        $this->product = $product->load('category', 'colors', 'sizes', 'variants.color', 'variants.size');
+        $this->product = $product->load('categories', 'colors', 'sizes', 'variants.color', 'variants.size');
 
         $this->selectedColorId = $this->product->colors->first()?->id;
         $this->selectedSizeId = $this->product->sizes->first()?->id;
@@ -95,7 +95,7 @@ class Show extends Component
             'isAvailable' => $this->isAvailable,
             'relatedProducts' => Product::query()
                 ->active()
-                ->where('category_id', $this->product->category_id)
+                ->whereHas('categories', fn ($q) => $q->whereIn('categories.id', $this->product->categories->pluck('id')))
                 ->where('id', '!=', $this->product->id)
                 ->inRandomOrder()
                 ->take(4)

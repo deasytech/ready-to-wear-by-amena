@@ -27,7 +27,7 @@ foreach ($resources as $resource) {
 
 it('lets the admin create and edit a product with variants', function () {
     $admin = adminUser();
-    $product = Product::factory()->for(\App\Models\Category::factory())->create();
+    $product = Product::factory()->create();
 
     $this->actingAs($admin)
         ->get("/admin/products/{$product->id}/edit")

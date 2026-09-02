@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Category;
 use App\Services\CurrencyService;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -36,7 +35,6 @@ class ProductFactory extends Factory
             ->all();
 
         return [
-            'category_id' => Category::factory(),
             'name' => $name,
             'slug' => $slug,
             'images' => $images,

@@ -1,7 +1,6 @@
 <?php
 
 use App\Livewire\Checkout\CheckoutFlow;
-use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductVariant;
@@ -15,7 +14,7 @@ it('places a cash-on-delivery order and decrements stock', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $product = Product::factory()->for(Category::factory())->create(['price' => 50000]);
+    $product = Product::factory()->create(['price' => 50000]);
     $variant = ProductVariant::factory()->for($product)->create(['stock' => 5]);
 
     app(CartService::class)->addItem($product, $variant, 2);
@@ -51,7 +50,7 @@ it('prevents ordering more than available stock', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $product = Product::factory()->for(Category::factory())->create(['price' => 50000]);
+    $product = Product::factory()->create(['price' => 50000]);
     $variant = ProductVariant::factory()->for($product)->create(['stock' => 1]);
 
     $cartService = app(CartService::class);

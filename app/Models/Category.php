@@ -6,6 +6,7 @@ use App\Support\Media;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Category extends Model
@@ -37,9 +38,9 @@ class Category extends Model
         return $this->hasMany(Category::class, 'parent_id');
     }
 
-    public function products(): HasMany
+    public function products(): BelongsToMany
     {
-        return $this->hasMany(Product::class);
+        return $this->belongsToMany(Product::class, 'category_product');
     }
 
     public function getImageUrlAttribute(): ?string
@@ -50,5 +51,20 @@ class Category extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    /**
+     * The id of this category plus the ids of all its descendant subcategories
+     * (recursively), used to filter products by a category "tree".
+     */
+    public function selfAndDescendantIds(): array
+    {
+        $ids = [$this->id];
+
+        foreach ($this->children as $child) {
+            $ids = [...$ids, ...$child->selfAndDescendantIds()];
+        }
+
+        return $ids;
     }
 }

@@ -72,18 +72,36 @@ class CatalogSeeder extends Seeder
         }
     }
 
+    /**
+     * Top-level catalogue categories mapped to their subcategories, so the
+     * seeded data demonstrates products being assignable to a category and
+     * any of its subcategories.
+     */
+    protected const CATEGORY_TREE = [
+        'Dresses' => ['Evening Dresses', 'Day Dresses'],
+        'Two Pieces' => [],
+        'Tops' => ['Blouses', 'Shirts'],
+        'Bottoms' => ['Trousers', 'Skirts'],
+        'Accessories' => [],
+    ];
+
     protected function seedCategories(): array
     {
-        $names = ['Dresses', 'Two Pieces', 'Tops', 'Bottoms', 'Accessories'];
         $categories = [];
 
-        foreach ($names as $name) {
-            $slug = Str::slug($name);
+        foreach (static::CATEGORY_TREE as $name => $children) {
             $categoryImage = static::pexelsUrl(static::IMAGE_POOLS[$name][0], 900, 1100);
             $categories[$name] = Category::updateOrCreate(
-                ['slug' => $slug],
-                ['name' => $name, 'is_active' => true, 'image' => $categoryImage]
+                ['slug' => Str::slug($name)],
+                ['name' => $name, 'is_active' => true, 'image' => $categoryImage, 'parent_id' => null]
             );
+
+            foreach ($children as $childName) {
+                $categories[$childName] = Category::updateOrCreate(
+                    ['slug' => Str::slug($childName)],
+                    ['name' => $childName, 'is_active' => true, 'image' => $categoryImage, 'parent_id' => $categories[$name]->id]
+                );
+            }
         }
 
         return $categories;
@@ -202,6 +220,8 @@ class CatalogSeeder extends Seeder
 
         foreach ($catalogue as $categoryName => $names) {
             $category = $categories[$categoryName];
+            $subcategories = collect(static::CATEGORY_TREE[$categoryName])
+                ->map(fn ($childName) => $categories[$childName]);
 
             $pool = static::IMAGE_POOLS[$categoryName];
 
@@ -213,7 +233,6 @@ class CatalogSeeder extends Seeder
                 $product = Product::updateOrCreate(
                     ['slug' => $slug],
                     [
-                        'category_id' => $category->id,
                         'name' => $name,
                         'images' => [
                             static::pexelsUrl($pool[$index % count($pool)], 900, 1200),
@@ -233,6 +252,15 @@ class CatalogSeeder extends Seeder
                         'on_sale' => $globalIndex % 7 === 0,
                     ]
                 );
+
+                // Assign the top-level category plus, when one exists, a round-robin
+                // subcategory - demonstrating a product belonging to a category and
+                // one of its subcategories at the same time.
+                $categoryIds = [$category->id];
+                if ($subcategories->isNotEmpty()) {
+                    $categoryIds[] = $subcategories[$index % $subcategories->count()]->id;
+                }
+                $product->categories()->sync($categoryIds);
 
                 // Every product offers 2-3 colours and 3-4 sizes, each combination
                 // becoming a stock-tracked variant (some intentionally at 0 stock).

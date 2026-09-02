@@ -2,7 +2,6 @@
 
 use App\Livewire\Checkout\CheckoutFlow;
 use App\Livewire\Storefront\Header;
-use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductVariant;
@@ -24,7 +23,7 @@ it('converts shipbubble NGN rates into the cart currency', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $product = Product::factory()->for(Category::factory())->create(['price' => 50000, 'price_usd' => 33]);
+    $product = Product::factory()->create(['price' => 50000, 'price_usd' => 33]);
     $variant = ProductVariant::factory()->for($product)->create(['stock' => 5]);
 
     app(CartService::class)->addItem($product, $variant, 1);
@@ -56,7 +55,7 @@ it('shows a retryable error and blocks progress when shipbubble has no pickup ad
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $product = Product::factory()->for(Category::factory())->create(['price' => 50000]);
+    $product = Product::factory()->create(['price' => 50000]);
     $variant = ProductVariant::factory()->for($product)->create(['stock' => 5]);
 
     app(CartService::class)->addItem($product, $variant, 1);
@@ -126,7 +125,7 @@ it('falls back to NGN when paystack rejects the order currency', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $product = Product::factory()->for(Category::factory())->create(['price' => 50000, 'price_usd' => 33]);
+    $product = Product::factory()->create(['price' => 50000, 'price_usd' => 33]);
     $variant = ProductVariant::factory()->for($product)->create(['stock' => 5]);
 
     app(CartService::class)->addItem($product, $variant, 1);
@@ -158,7 +157,7 @@ it('lets a customer switch currency from the header', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $product = Product::factory()->for(Category::factory())->create(['price' => 50000, 'price_usd' => 33]);
+    $product = Product::factory()->create(['price' => 50000, 'price_usd' => 33]);
     $variant = ProductVariant::factory()->for($product)->create(['stock' => 5, 'price_override' => 40000, 'price_override_usd' => 26]);
 
     $cartService = app(CartService::class);
