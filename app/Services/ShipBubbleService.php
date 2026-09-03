@@ -141,6 +141,11 @@ class ShipBubbleService
             if ($response->successful()) {
                 return $response->json();
             }
+
+            Log::warning('ShipBubble getRates returned a non-successful response', [
+                'status' => $response->status(),
+                'body' => $response->json() ?? $response->body(),
+            ]);
         } catch (\Throwable $e) {
             Log::warning('ShipBubble getRates failed: '.$e->getMessage());
         }
