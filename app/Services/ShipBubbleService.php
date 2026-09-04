@@ -109,10 +109,15 @@ class ShipBubbleService
      */
     public function validateAddress(array $payload): array
     {
-        return $this->client()
-            ->post("{$this->baseUrl}/shipping/address/validate", $payload)
-            ->throw()
-            ->json();
+        $url = "{$this->baseUrl}/shipping/address/validate";
+
+        try {
+            return $this->client()->post($url, $payload)->throw()->json();
+        } catch (\Illuminate\Http\Client\RequestException $e) {
+            $this->logRequestFailure('POST', $url, $payload, $e);
+
+            throw $e;
+        }
     }
 
     /**
@@ -122,10 +127,36 @@ class ShipBubbleService
      */
     public function updateAddress(array $payload): array
     {
-        return $this->client()
-            ->put("{$this->baseUrl}/shipping/address/update", $payload)
-            ->throw()
-            ->json();
+        $url = "{$this->baseUrl}/shipping/address/update";
+
+        try {
+            return $this->client()->put($url, $payload)->throw()->json();
+        } catch (\Illuminate\Http\Client\RequestException $e) {
+            $this->logRequestFailure('PUT', $url, $payload, $e);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Logs everything needed to diagnose a failed ShipBubble call after the
+     * fact (method, url, payload, status, full response body/headers) -
+     * added because production (cPanel, no SSH/tinker access) kept returning
+     * 404 "Requested resource not available" on address validate/update
+     * while the same payload succeeded locally, and the bare exception
+     * message alone wasn't enough to tell create vs. update, or which
+     * address/address_code was involved.
+     */
+    protected function logRequestFailure(string $method, string $url, array $payload, \Illuminate\Http\Client\RequestException $e): void
+    {
+        Log::error("ShipBubble {$method} {$url} failed", [
+            'payload' => $payload,
+            'status' => $e->response->status(),
+            'body' => $e->response->json() ?? $e->response->body(),
+            'rate_limit_headers' => collect($e->response->headers())
+                ->filter(fn ($v, $k) => str_contains(strtolower($k), 'rate') || str_contains(strtolower($k), 'limit'))
+                ->all(),
+        ]);
     }
 
     /**

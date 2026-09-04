@@ -43,7 +43,7 @@ return [
 
     'shipbubble' => [
         'api_key' => env('SHIPBUBBLE_API_KEY'),
-        'base_url' => env('SHIPBUBBLE_BASE_URL', 'https://api.shipbubble.com'),
+        'base_url' => env('SHIPBUBBLE_BASE_URL', 'https://api.shipbubble.com/v1'),
     ],
 
 ];

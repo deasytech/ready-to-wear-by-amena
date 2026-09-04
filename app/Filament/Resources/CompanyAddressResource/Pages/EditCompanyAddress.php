@@ -64,9 +64,28 @@ class EditCompanyAddress extends EditRecord
             ];
 
         try {
-            $response = $hasAddressCode
-                ? $sb->updateAddress($addressPayload)
-                : $sb->validateAddress($addressPayload);
+            try {
+                $response = $hasAddressCode
+                    ? $sb->updateAddress($addressPayload)
+                    : $sb->validateAddress($addressPayload);
+            } catch (\Illuminate\Http\Client\RequestException $e) {
+                // A 404 here means ShipBubble doesn't recognise this
+                // address_code at all (e.g. it was created under a
+                // different API key/environment than the one now
+                // configured) - updating it can never succeed, so treat
+                // it as unvalidated and validate the address fresh instead.
+                if (! $hasAddressCode || $e->response->status() !== 404) {
+                    throw $e;
+                }
+
+                $hasAddressCode = false;
+                $response = $sb->validateAddress([
+                    'name' => $data['name'],
+                    'email' => $data['email'],
+                    'phone' => $data['phone'],
+                    'address' => $data['address'],
+                ]);
+            }
 
             if (is_string($response)) {
                 $response = json_decode($response, true);
@@ -86,7 +105,11 @@ class EditCompanyAddress extends EditRecord
             $data['postal_code']    = $addressData['postal_code'] ?? ($data['postal_code'] ?? null);
             $data['country']        = $addressData['country'] ?? ($data['country'] ?? null);
         } catch (\Exception $e) {
-            Log::error('ShipBubble Error: '.$e->getMessage());
+            Log::error('ShipBubble Error on EditCompanyAddress: '.$e->getMessage(), [
+                'record_id' => $this->getRecord()->getKey(),
+                'address_code' => $existingAddressCode,
+                'method' => $hasAddressCode ? 'updateAddress' : 'validateAddress',
+            ]);
 
             Notification::make()
                 ->danger()
