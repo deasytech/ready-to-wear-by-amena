@@ -121,7 +121,7 @@
                             @foreach ($liveCouriers as $index => $courier)
                                 <label class="flex cursor-pointer items-center justify-between border border-neutral-300 p-4 has-[:checked]:border-black">
                                     <span class="flex items-center gap-3">
-                                        <input type="radio" wire:model="selectedCourierIndex" value="{{ $index }}" class="text-black focus:ring-black">
+                                        <input type="radio" wire:model.live="selectedCourierIndex" value="{{ $index }}" class="text-black focus:ring-black">
                                         <span>
                                             <span class="block text-sm font-medium">{{ $courier['courier_name'] ?? 'Courier' }}</span>
                                             @if (! empty($courier['delivery_eta_time']))
